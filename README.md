@@ -1,6 +1,6 @@
 # 🏠 EXPREZZZO Sovereign LLM House
 
-[![Sovereignty Check](https://github.com/YOUR_USERNAME/exprezzzo-house/workflows/Sovereignty%20Check/badge.svg)](https://github.com/YOUR_USERNAME/exprezzzo-house/actions)
+[![Sovereignty Check](https://github.com/Exprezzzo/exprezzzo-house/workflows/Sovereignty%20Check/badge.svg)](https://github.com/Exprezzzo/exprezzzo-house/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black)](https://nextjs.org/)
