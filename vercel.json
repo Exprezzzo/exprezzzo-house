@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "env": {
+    "NODE_ENV": "production",
+    "SOVEREIGNTY_MODE": "enforced",
+    "MAX_COST_PER_REQUEST": "0.001",
+    "BRAND_GOLD": "#C5B358",
+    "BRAND_CHOCOLATE": "#381819",
+    "BRAND_SAND": "#EDC9AF",
+    "BRAND_ROSE": "#C72C41",
+    "BRAND_DUST": "#A89F91",
+    "BRAND_LIGHT_SAND": "#F5F5DC"
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
+  }
+}

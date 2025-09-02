@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Send, Zap, DollarSign } from 'lucide-react'
+import { api } from '@/lib/api'
 
 export default function ChatRoom() {
   const [messages, setMessages] = useState<Array<{role: string, content: string, cost?: string, tokens?: number}>>([])
@@ -19,28 +20,22 @@ export default function ChatRoom() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage,
-          room: 'Chat',
-          model,
-          sessionId
-        })
+      const data = await api.chat({
+        message: userMessage,
+        room: 'Chat',
+        model,
+        sessionId
       })
-
-      const data = await response.json()
       
-      if (response.status === 403) {
+      if (data.error) {
         setMessages(prev => [...prev, { 
           role: 'system', 
-          content: `Cost limit exceeded: ${data.error}. Degrading to sovereign-only mode.`
+          content: `Error: ${data.error}`
         }])
       } else {
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: data.response || data.error,
+          content: data.response,
           cost: data.cost,
           tokens: data.tokens
         }])

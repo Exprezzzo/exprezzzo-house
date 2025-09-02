@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Shield, DollarSign, AlertTriangle } from 'lucide-react'
+import { api } from '@/lib/api'
 
 interface SovereigntyScore {
   vendor_name: string
@@ -23,18 +24,15 @@ export default function Home() {
   const [providers, setProviders] = useState<Provider[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:3001/health')
-      .then(res => res.json())
+    api.health()
       .then(setHealth)
       .catch(console.error)
 
-    fetch('http://localhost:3001/api/sovereignty')
-      .then(res => res.json())
+    api.sovereignty()
       .then(data => setSovereignty(data.vendors))
       .catch(console.error)
 
-    fetch('http://localhost:3001/api/providers')
-      .then(res => res.json())
+    api.providers()
       .then(data => setProviders(data.providers))
       .catch(console.error)
   }, [])

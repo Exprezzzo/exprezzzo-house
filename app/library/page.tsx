@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search, Plus, Database } from 'lucide-react'
+import { api } from '@/lib/api'
 
 export default function LibraryRoom() {
   const [content, setContent] = useState('')
@@ -11,8 +12,7 @@ export default function LibraryRoom() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/sessions')
-      .then(res => res.json())
+    api.sessions()
       .then(data => setSessions(data.sessions || []))
       .catch(console.error)
   }, [])
@@ -22,16 +22,10 @@ export default function LibraryRoom() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3001/api/embed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          room: 'Library'
-        })
+      const data = await api.embed({
+        content,
+        room: 'Library'
       })
-
-      const data = await response.json()
       alert(`Added to library with ID: ${data.id}`)
       setContent('')
     } catch (error) {
@@ -46,17 +40,11 @@ export default function LibraryRoom() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3001/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: searchQuery,
-          room: 'Library',
-          limit: 10
-        })
+      const data = await api.search({
+        query: searchQuery,
+        room: 'Library',
+        limit: 10
       })
-
-      const data = await response.json()
       setSearchResults(data.results || [])
     } catch (error) {
       alert('Search failed')
