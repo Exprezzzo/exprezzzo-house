@@ -1,0 +1,45 @@
+name: Sovereignty Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sovereignty:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run sovereignty check
+      run: npm run sovereignty-check
+      
+    - name: Vegas palette check
+      run: |
+        echo "Checking for non-Vegas colors..."
+        ! grep -r "#000000\|#FFFFFF\|#FF0000\|#00FF00\|#0000FF" app/ --include="*.tsx" --include="*.css" || exit 1
+        
+    - name: Verify escape routes
+      run: |
+        test -f docker-compose.yml || exit 1
+        test -f Dockerfile || exit 1
+        echo "✅ Escape routes verified"
+        
+    - name: Cost limit check
+      run: |
+        if grep -q "MAX_COST_PER_REQUEST=0.001" .env.local; then
+          echo "✅ Cost limit enforced"
+        else
+          echo "❌ Cost limit not properly set"
+          exit 1
+        fi

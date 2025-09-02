@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production --legacy-peer-deps
+COPY ./api ./api
+COPY .env.local .env.local
+EXPOSE 3001
+CMD ["node", "--experimental-modules", "api/server.js"]
