@@ -11,22 +11,6 @@
     "BRAND_DUST": "#A89F91",
     "BRAND_LIGHT_SAND": "#F5F5DC"
   },
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "functions": {
     "api/index.js": {
       "maxDuration": 30
