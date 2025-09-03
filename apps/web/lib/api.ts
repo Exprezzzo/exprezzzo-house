@@ -88,10 +88,10 @@ export const api = {
     // Mock sovereignty data for now
     return {
       vendors: [
-        { vendor_name: 'Ollama', sovereignty_score: 1.0 },
-        { vendor_name: 'PostgreSQL', sovereignty_score: 1.0 },
-        { vendor_name: 'Redis', sovereignty_score: 1.0 },
-        { vendor_name: 'OpenAI', sovereignty_score: 0.2 }
+        { vendor_name: 'Ollama', sovereignty_score: 1.0, lock_in_risk: 'none', escape_difficulty: 'easy' },
+        { vendor_name: 'PostgreSQL', sovereignty_score: 1.0, lock_in_risk: 'none', escape_difficulty: 'easy' },
+        { vendor_name: 'Redis', sovereignty_score: 1.0, lock_in_risk: 'none', escape_difficulty: 'easy' },
+        { vendor_name: 'OpenAI', sovereignty_score: 0.2, lock_in_risk: 'high', escape_difficulty: 'hard' }
       ]
     }
   },
@@ -100,8 +100,8 @@ export const api = {
     // Mock providers data for now
     return {
       providers: [
-        { type: 'sovereign', name: 'Ollama', enabled: true, cost: 0.0001 },
-        { type: 'fallback', name: 'OpenAI', enabled: false, cost: 0.002 }
+        { type: 'sovereign', name: 'Ollama', enabled: true, sovereignty_score: 1.0 },
+        { type: 'fallback', name: 'OpenAI', enabled: false, sovereignty_score: 0.2 }
       ]
     }
   }
