@@ -1,5 +1,8 @@
 {
-  "version": 2,
+  "buildCommand": "cd apps/web && npm install && npm run build",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
   "env": {
     "NODE_ENV": "production",
     "SOVEREIGNTY_MODE": "enforced",
@@ -11,9 +14,10 @@
     "BRAND_DUST": "#A89F91",
     "BRAND_LIGHT_SAND": "#F5F5DC"
   },
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://exprezzzo-api.vercel.app/api/:path*"
     }
-  }
+  ]
 }

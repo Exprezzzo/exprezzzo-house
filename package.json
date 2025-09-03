@@ -1,50 +1,22 @@
 {
-  "name": "exprezzzo-sovereign-house",
-  "version": "4.0.0",
-  "description": "EXPREZZZO Sovereign LLM House - Hurricane Spec",
+  "name": "exprezzzo-house",
+  "version": "5.0.0",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:next\" \"npm run dev:api\"",
-    "dev:next": "next dev",
-    "dev:api": "nodemon --experimental-modules api/server.js",
-    "build": "next build",
-    "start": "concurrently \"npm run start:next\" \"npm run start:api\"",
-    "start:next": "next start",
-    "start:api": "node --experimental-modules api/server.js",
-    "sovereignty-check": "node --experimental-modules scripts/sovereignty-check.js",
-    "test": "npm run sovereignty-check"
-  },
-  "dependencies": {
-    "next": "14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "express": "^4.19.2",
-    "pg": "^8.12.0",
-    "pgvector": "^0.2.0",
-    "redis": "^4.7.0",
-    "ollama": "^0.5.9",
-    "dotenv": "^16.4.5",
-    "cors": "^2.8.5",
-    "helmet": "^7.1.0",
-    "compression": "^1.7.4",
-    "express-rate-limit": "^7.4.0",
-    "winston": "^3.14.2",
-    "zod": "^3.23.8",
-    "tailwindcss": "^3.4.10",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.447.0"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "deploy": "vercel --prod"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.4",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.5",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.45",
-    "nodemon": "^3.1.4",
-    "concurrently": "^8.2.2"
-  }
+    "turbo": "latest",
+    "prettier": "^3.0.0"
+  },
+  "packageManager": "pnpm@8.0.0"
 }
