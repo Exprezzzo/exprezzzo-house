@@ -12,9 +12,11 @@ export default function LibraryRoom() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    api.sessions()
-      .then(data => setSessions(data.sessions || []))
-      .catch(console.error)
+    // Mock sessions data for now
+    setSessions([
+      { id: 1, updated_at: new Date().toISOString(), total_tokens: 1500, total_cost: '0.003' },
+      { id: 2, updated_at: new Date(Date.now() - 86400000).toISOString(), total_tokens: 800, total_cost: '0.0016' }
+    ])
   }, [])
 
   const addToLibrary = async () => {
@@ -22,10 +24,7 @@ export default function LibraryRoom() {
     setLoading(true)
 
     try {
-      const data = await api.embed({
-        content,
-        room: 'Library'
-      })
+      const data = await api.embed(content)
       alert(`Added to library with ID: ${data.id}`)
       setContent('')
     } catch (error) {
@@ -42,7 +41,6 @@ export default function LibraryRoom() {
     try {
       const data = await api.search({
         query: searchQuery,
-        room: 'Library',
         limit: 10
       })
       setSearchResults(data.results || [])
