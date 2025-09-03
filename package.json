@@ -1,22 +1,14 @@
 {
   "name": "exprezzzo-house",
-  "version": "5.0.0",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "version": "4.1.0",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "start": "turbo start",
-    "lint": "turbo lint",
-    "clean": "turbo clean",
-    "deploy": "vercel --prod"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
-  "devDependencies": {
-    "turbo": "latest",
-    "prettier": "^3.0.0"
-  },
-  "packageManager": "pnpm@8.0.0"
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
 }
