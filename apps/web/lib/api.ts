@@ -69,5 +69,40 @@ export const api = {
       console.error('Search API Error:', error)
       return { error: 'Search failed', results: [] }
     }
+  },
+
+  async health() {
+    try {
+      const response = await fetch(`${API_BASE}/health`)
+      return await response.json()
+    } catch (error) {
+      console.error('Health API Error:', error)
+      return { 
+        status: 'error',
+        services: { ollama: 'disconnected', postgres: 'disconnected', redis: 'disconnected' }
+      }
+    }
+  },
+
+  async sovereignty() {
+    // Mock sovereignty data for now
+    return {
+      vendors: [
+        { vendor_name: 'Ollama', sovereignty_score: 1.0 },
+        { vendor_name: 'PostgreSQL', sovereignty_score: 1.0 },
+        { vendor_name: 'Redis', sovereignty_score: 1.0 },
+        { vendor_name: 'OpenAI', sovereignty_score: 0.2 }
+      ]
+    }
+  },
+
+  async providers() {
+    // Mock providers data for now
+    return {
+      providers: [
+        { type: 'sovereign', name: 'Ollama', enabled: true, cost: 0.0001 },
+        { type: 'fallback', name: 'OpenAI', enabled: false, cost: 0.002 }
+      ]
+    }
   }
 }
