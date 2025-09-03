@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EXPREZZZO House</title>
+    <style>
+        body {
+            font-family: -apple-system, system-ui;
+            margin: 0;
+            padding: 20px;
+            background: #381819;
+            color: #F5F5DC;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #C5B358;
+            text-align: center;
+        }
+        .room {
+            display: block;
+            background: #C5B358;
+            color: #381819;
+            padding: 20px;
+            margin: 10px 0;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status {
+            background: rgba(197, 179, 88, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 EXPREZZZO House</h1>
+        <div class="status">
+            <strong>Status:</strong> Sovereign & Mobile Ready<br>
+            <strong>Cost:</strong> $0.001/request<br>
+            <strong>Mode:</strong> Overnight Access
+        </div>
+        <a href="#" class="room" onclick="showRoom('Chat', '💬 Sovereign AI conversations available')">💬 Chat</a>
+        <a href="#" class="room" onclick="showRoom('Library', '📚 Knowledge base and document storage')">📚 Library</a>
+        <a href="#" class="room" onclick="showRoom('Workspace', '💼 Project management and tools')">💼 Workspace</a>
+        <a href="#" class="room" onclick="showRoom('Vault', '🔐 Secure credential and key storage')">🔐 Vault</a>
+        <a href="#" class="room" onclick="showRoom('Network', '🌐 Connection monitoring and status')">🌐 Network</a>
+        <a href="#" class="room" onclick="showRoom('Admin', '⚙️ System administration and controls')">⚙️ Admin</a>
+        <p style="text-align:center; margin-top:40px; font-size:14px;">
+            EXPREZZZO = 3 Z's Always<br>
+            The House Always Wins 🌹
+        </p>
+    </div>
+    
+    <script>
+        function showRoom(name, desc) {
+            alert(`${name} Room\n\n${desc}\n\nNote: Full functionality requires local development server.\nThis is overnight mobile access mode.`);
+        }
+    </script>
+</body>
+</html>
