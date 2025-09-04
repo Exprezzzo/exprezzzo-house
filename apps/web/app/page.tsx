@@ -1,135 +1,53 @@
-"use client"
-
-import { useEffect, useState } from 'react'
-import { Shield, DollarSign, AlertTriangle } from 'lucide-react'
-import { api } from '@/lib/api'
-
-interface SovereigntyScore {
-  vendor_name: string
-  sovereignty_score: number
-  lock_in_risk: string
-  escape_difficulty: string
-}
-
-interface Provider {
-  name: string
-  type: string
-  enabled: boolean
-  sovereignty_score: number
-}
+'use client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Crown, Zap } from 'lucide-react'
 
 export default function Home() {
-  const [health, setHealth] = useState<any>(null)
-  const [sovereignty, setSovereignty] = useState<SovereigntyScore[]>([])
-  const [providers, setProviders] = useState<Provider[]>([])
+  const router = useRouter()
 
   useEffect(() => {
-    api.health()
-      .then(setHealth)
-      .catch(console.error)
+    // Redirect to master room after 2 seconds
+    const timer = setTimeout(() => {
+      router.push('/rooms/master')
+    }, 2000)
 
-    api.sovereignty()
-      .then(data => setSovereignty(data.vendors))
-      .catch(console.error)
-
-    api.providers()
-      .then(data => setProviders(data.providers))
-      .catch(console.error)
-  }, [])
-
-  const getScoreColor = (score: number) => {
-    if (score >= 0.9) return 'text-green-500'
-    if (score >= 0.7) return 'text-yellow-500'
-    return 'text-red-500'
-  }
+    return () => clearTimeout(timer)
+  }, [router])
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-3xl font-bold text-vegas-gold">Master Bedroom - Orchestration Center</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card-sovereign">
-          <div className="flex items-center gap-2 mb-2">
-            <Shield className="text-vegas-gold" />
-            <h3 className="text-lg font-semibold text-vegas-gold">Sovereignty</h3>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chocolate via-vegas-dust to-chocolate">
+      <div className="text-center space-y-8 p-12">
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <Crown className="w-20 h-20 text-vegas-gold animate-pulse" />
+          <div>
+            <h1 className="text-8xl font-bold text-vegas-gold mb-4">
+              EXPRE<span className="animate-shimmer">ZZZ</span>O
+            </h1>
+            <p className="text-2xl text-desert-sand">Sovereign House</p>
           </div>
-          <p className="text-2xl font-bold text-green-500">100%</p>
-          <p className="text-sm text-dust">Local-first enforced</p>
         </div>
         
-        <div className="card-sovereign">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="text-vegas-gold" />
-            <h3 className="text-lg font-semibold text-vegas-gold">Cost Target</h3>
-          </div>
-          <p className="text-2xl font-bold text-green-500">$0.001</p>
-          <p className="text-sm text-dust">Per request maximum</p>
-        </div>
-        
-        <div className="card-sovereign">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="text-vegas-gold" />
-            <h3 className="text-lg font-semibold text-vegas-gold">Escape Protocol</h3>
-          </div>
-          <p className="text-2xl font-bold text-green-500">Ready</p>
-          <p className="text-sm text-dust">Docker compose active</p>
-        </div>
-      </div>
-
-      <div className="card-sovereign">
-        <h3 className="text-xl font-semibold mb-4 text-vegas-gold">System Status</h3>
-        {health && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>Database: {health.services?.database ? '✅' : '❌'}</div>
-            <div>Cache: {health.services?.cache ? '✅' : '❌'}</div>
-            <div>LLM: {health.services?.llm ? '✅' : '❌'}</div>
-            <div>Mode: {health.sovereignty?.mode}</div>
-            <div className="col-span-2 md:col-span-4">
-              Models: {health.services?.models?.join(', ') || 'None'}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card-sovereign">
-          <h3 className="text-xl font-semibold mb-4 text-vegas-gold">Sovereignty Scores</h3>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {sovereignty.map((vendor) => (
-              <div key={vendor.vendor_name} className="flex justify-between items-center">
-                <span>{vendor.vendor_name}</span>
-                <div className="flex gap-4 items-center">
-                  <span className={getScoreColor(vendor.sovereignty_score)}>
-                    {(vendor.sovereignty_score * 100).toFixed(0)}%
-                  </span>
-                  <span className="text-xs text-dust">{vendor.lock_in_risk}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="space-y-4 text-lg text-desert-sand">
+          <p className="flex items-center justify-center gap-2">
+            <Zap className="w-5 h-5 text-vegas-gold" />
+            Vegas-First Architecture
+          </p>
+          <p className="text-vegas-gold font-bold">$0.001 per request</p>
+          <p className="text-sm">Sovereign • Always • Immutable</p>
         </div>
 
-        <div className="card-sovereign">
-          <h3 className="text-xl font-semibold mb-4 text-vegas-gold">Provider Lanes</h3>
-          <div className="space-y-2">
-            {providers.map((provider) => (
-              <div key={provider.name} className="flex justify-between items-center">
-                <span>{provider.name}</span>
-                <div className="flex gap-4 items-center">
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    provider.type === 'sovereign' ? 'bg-green-500/20 text-green-500' :
-                    provider.type === 'flash' ? 'bg-yellow-500/20 text-yellow-500' :
-                    'bg-red-500/20 text-red-500'
-                  }`}>
-                    {provider.type}
-                  </span>
-                  <span className={provider.enabled ? 'text-green-500' : 'text-gray-500'}>
-                    {provider.enabled ? '✓' : '✗'}
-                  </span>
-                </div>
-              </div>
-            ))}
+        <div className="mt-12 space-y-2">
+          <div className="flex justify-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-vegas-gold rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-vegas-gold rounded-full animate-bounce delay-100"></div>
+            <div className="w-3 h-3 bg-vegas-gold rounded-full animate-bounce delay-200"></div>
           </div>
+          <p className="text-vegas-gold">Entering the House...</p>
+        </div>
+
+        <div className="mt-16 text-sm text-desert-sand/60">
+          <p>🎰 Welcome to the most sovereign AI house in Vegas 🎰</p>
         </div>
       </div>
     </div>

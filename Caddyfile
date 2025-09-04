@@ -1,7 +1,21 @@
-:80 {
-    reverse_proxy web:3000
-    
-    handle_path /api/* {
-        reverse_proxy api:3001
-    }
+exprezzzo.house {
+  reverse_proxy /api/* exprezzzo-house:3000
+  reverse_proxy /* exprezzzo-house:3000
+  
+  header {
+    X-Sovereignty "ENFORCED"
+    X-Vegas "GOLD"
+    X-Cost-Per-Request "$0.001"
+    X-Powered-By "EXPREZZZO-Sovereign-House"
+  }
+  
+  # Enable compression
+  encode gzip
+  
+  # Security headers
+  header {
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
 }

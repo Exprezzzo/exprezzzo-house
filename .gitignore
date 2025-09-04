@@ -1,61 +1,47 @@
 # Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Next.js
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Production
+dist/
+
+# Misc
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production
-.next/
-out/
-build/
-
-# Environment variables
+# Env files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-logs
-*.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Database
-*.db
-*.sqlite
-
-# Temporary folders
-tmp/
-temp/
-
-# Claude Code settings (keep local only)
-.claude/settings.local.json
+# Vercel
 .vercel
+
+# Docker
+*.tar.gz
+exprezzzo-house-deploy.tar.gz
+
+# Nested apps
+apps/web/node_modules/
+apps/web/.next/

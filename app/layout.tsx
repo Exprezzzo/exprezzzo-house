@@ -1,13 +1,12 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-import Navigation from '@/components/Navigation'
+import { Inter } from 'next/font/google'
+import CompactNavigation from '@/components/CompactNavigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'EXPREZZZO Sovereign House',
-  description: 'Vegas-first, sovereign-always, $0.001/request immutable',
+export const metadata = {
+  title: 'EXPREZZZO House - Sovereign AI at $0.001',
+  description: 'The Rose Blooms in the Desert 🌹 - Vegas-first, sovereign-always',
 }
 
 export default function RootLayout({
@@ -16,40 +15,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
-          <header className="bg-chocolate/95 backdrop-blur-sm border-b-2 border-vegas-gold">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-              <div className="flex flex-col">
-                <h1 className="text-3xl font-bold text-vegas-gold">
-                  EXPRE<span className="animate-shimmer">ZZZ</span>O
-                </h1>
-                <span className="text-desert-sand text-sm">Sovereign LLM House</span>
-              </div>
-              <div className="flex gap-4 items-center">
-                <span className="text-green-500">● Sovereign</span>
-                <span className="bg-vegas-gold text-chocolate px-3 py-1 rounded-full font-bold">
-                  $0.001/req
-                </span>
-              </div>
-            </div>
-          </header>
-          
-          <Navigation />
-          
-          <main className="flex-grow container mx-auto px-4 py-8">
-            {children}
-          </main>
-          
-          <footer className="bg-chocolate/95 border-t-2 border-vegas-gold py-4">
-            <div className="container mx-auto px-4 flex justify-between text-desert-sand">
+    <html lang="en">
+      <body className={`${inter.className} bg-[#381819] text-[#C5B358] min-h-screen`}>
+        <CompactNavigation />
+        <main className="min-h-[calc(100vh-80px)]">
+          {children}
+        </main>
+        
+        {/* Vegas Footer */}
+        <footer className="bg-[#381819] border-t-2 border-[#C5B358] py-4 text-center">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-center items-center gap-6 text-sm text-[#EDC9AF]">
               <span>© 2025 EXPREZZZO Sovereign House</span>
-              <span>Escape Protocol: Ready</span>
-              <span>Vegas First™</span>
+              <span className="text-green-500">● $0.001/req</span>
+              <span>🌹 The Rose Blooms in Vegas 🌹</span>
             </div>
-          </footer>
-        </div>
+          </div>
+        </footer>
       </body>
     </html>
   )

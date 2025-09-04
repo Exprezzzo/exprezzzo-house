@@ -1,66 +1,70 @@
 version: '3.8'
 
 services:
-  web:
+  exprezzzo-house:
     build: .
+    container_name: exprezzzo-sovereign-house
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://exprezzzo:sovereign@postgres:5432/exprezzzo_house
+      - SOVEREIGNTY_ENFORCED=true
+      - TARGET_COST=0.001
+      - POSTGRES_URL=postgres://sovereign:vegas@postgres:5432/exprezzzo
       - REDIS_URL=redis://redis:6379
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_URL=http://ollama:11434
     depends_on:
       - postgres
       - redis
       - ollama
-      - api
-
-  api:
-    build: 
-      context: .
-      dockerfile: Dockerfile.api
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://exprezzzo:sovereign@postgres:5432/exprezzzo_house
-      - REDIS_URL=redis://redis:6379
-      - OLLAMA_BASE_URL=http://ollama:11434
-    depends_on:
-      - postgres
-      - redis
-      - ollama
+    networks:
+      - exprezzzo-network
+    restart: unless-stopped
 
   postgres:
-    image: pgvector/pgvector:pg16
+    image: postgres:16-alpine
+    container_name: exprezzzo-postgres
     environment:
-      - POSTGRES_USER=exprezzzo
-      - POSTGRES_PASSWORD=sovereign
-      - POSTGRES_DB=exprezzzo_house
+      - POSTGRES_USER=sovereign
+      - POSTGRES_PASSWORD=vegas
+      - POSTGRES_DB=exprezzzo
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/setup-database.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
+    networks:
+      - exprezzzo-network
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    container_name: exprezzzo-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - exprezzzo-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
 
   ollama:
     image: ollama/ollama:latest
+    container_name: exprezzzo-ollama
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    command: serve
+    networks:
+      - exprezzzo-network
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
 
   caddy:
     image: caddy:alpine
+    container_name: exprezzzo-caddy
     ports:
       - "80:80"
       - "443:443"
@@ -68,13 +72,25 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+    networks:
+      - exprezzzo-network
+    restart: unless-stopped
     depends_on:
-      - web
-      - api
+      - exprezzzo-house
 
 volumes:
   postgres_data:
+    name: exprezzzo_postgres_data
   redis_data:
+    name: exprezzzo_redis_data
   ollama_data:
+    name: exprezzzo_ollama_data
   caddy_data:
+    name: exprezzzo_caddy_data
   caddy_config:
+    name: exprezzzo_caddy_config
+
+networks:
+  exprezzzo-network:
+    name: exprezzzo-network
+    driver: bridge

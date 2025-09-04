@@ -1,14 +1,37 @@
 {
-  "name": "exprezzzo-house",
+  "name": "exprezzzo-sovereign-house",
   "version": "4.1.0",
+  "description": "Vegas-first, sovereign-always, $0.001/request",
+  "main": "server.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "start": "node server.js",
+    "orchestrate": "node orchestrator.js",
+    "build": "cd apps/web && npm run build",
+    "dev": "cd apps/web && npm run dev",
+    "deploy": "./build-production.sh",
+    "sovereignty": "node scripts/sovereignty-check.js"
   },
+  "keywords": [
+    "exprezzzo",
+    "sovereign",
+    "vegas",
+    "ai",
+    "llm",
+    "nextjs"
+  ],
+  "author": "EXPREZZZO House",
+  "license": "MIT",
   "dependencies": {
-    "next": "14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  }
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exprezzzo/sovereign-house.git"
+  },
+  "homepage": "https://exprezzzo-house.vercel.app"
 }

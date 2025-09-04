@@ -4,14 +4,13 @@ import { usePathname } from 'next/navigation'
 import { Home, MessageSquare, Book, Briefcase, Shield, Network, Settings, Crown } from 'lucide-react'
 
 const navigation = [
-  { name: 'Master', href: '/', icon: Home },
-  { name: 'Chat', href: '/chat', icon: MessageSquare },
-  { name: 'Library', href: '/library', icon: Book },
-  { name: 'Workspace', href: '/workspace', icon: Briefcase },
-  { name: 'Vault', href: '/vault', icon: Shield },
-  { name: 'Network', href: '/network', icon: Network },
-  { name: 'Admin', href: '/admin', icon: Crown },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Master', href: '/rooms/master', icon: Home },
+  { name: 'Chat', href: '/rooms/chat', icon: MessageSquare },
+  { name: 'Library', href: '/rooms/library', icon: Book },
+  { name: 'Workspace', href: '/rooms/workspace', icon: Briefcase },
+  { name: 'Vault', href: '/rooms/vault', icon: Shield },
+  { name: 'Network', href: '/rooms/network', icon: Network },
+  { name: 'Admin', href: '/rooms/admin', icon: Crown },
 ]
 
 export default function Navigation() {

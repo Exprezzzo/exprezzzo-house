@@ -1,27 +1,48 @@
 {
   "version": 2,
-  "name": "exprezzzo-house",
-  "builds": [
+  "name": "exprezzzo-sovereign-house",
+  "buildCommand": "cd apps/web && npm run build",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "cd apps/web && npm install",
+  "framework": "nextjs",
+  "functions": {
+    "apps/web/app/api/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "env": {
+    "SOVEREIGNTY_ENFORCED": "true",
+    "TARGET_COST": "0.001",
+    "NEXT_PUBLIC_SOVEREIGNTY": "ENFORCED",
+    "NEXT_PUBLIC_COST": "0.001"
+  },
+  "headers": [
     {
-      "src": "apps/web/package.json",
-      "use": "@vercel/next"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Sovereignty",
+          "value": "ENFORCED"
+        },
+        {
+          "key": "X-Vegas",
+          "value": "GOLD"
+        },
+        {
+          "key": "X-Cost-Per-Request", 
+          "value": "$0.001"
+        },
+        {
+          "key": "X-Powered-By",
+          "value": "EXPREZZZO-Sovereign-House"
+        }
+      ]
     }
   ],
-  "env": {
-    "NODE_ENV": "production",
-    "SOVEREIGNTY_MODE": "enforced",
-    "MAX_COST_PER_REQUEST": "0.001",
-    "BRAND_GOLD": "#C5B358",
-    "BRAND_CHOCOLATE": "#381819",
-    "BRAND_SAND": "#EDC9AF",
-    "BRAND_ROSE": "#C72C41",
-    "BRAND_DUST": "#A89F91",
-    "BRAND_LIGHT_SAND": "#F5F5DC"
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://exprezzzo-api.vercel.app/api/$1"
+      "destination": "/api/$1"
     }
   ]
 }
