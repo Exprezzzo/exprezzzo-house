@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { initializeDatabase, getPostgresPool, getRedisClient } from '@/lib/database'
 
-export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST() {
