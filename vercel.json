@@ -1,13 +1,13 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": ".next",
+  "buildCommand": "cd apps/web && npm install && npm run build",
+  "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "installCommand": "npm install",
+  "installCommand": "cd apps/web && npm install",
   "functions": {
-    "app/api/chat/sse/route.ts": {
+    "apps/web/app/api/chat/sse/route.ts": {
       "maxDuration": 10
     },
-    "app/api/sse/*/route.ts": {
+    "apps/web/app/api/sse/*/route.ts": {
       "maxDuration": 10
     }
   }
