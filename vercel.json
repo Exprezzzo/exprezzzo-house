@@ -1,42 +1,14 @@
 {
-  "version": 2,
-  "buildCommand": "cd apps/web && npm run build",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "cd apps/web && npm install",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": ".next",
   "framework": "nextjs",
-  "env": {
-    "SOVEREIGNTY_ENFORCED": "true",
-    "TARGET_COST": "0.001",
-    "NEXT_PUBLIC_SOVEREIGNTY": "ENFORCED",
-    "NEXT_PUBLIC_COST": "0.001"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Sovereignty",
-          "value": "ENFORCED"
-        },
-        {
-          "key": "X-Vegas",
-          "value": "GOLD"
-        },
-        {
-          "key": "X-Cost-Per-Request", 
-          "value": "$0.001"
-        },
-        {
-          "key": "X-Powered-By",
-          "value": "EXPREZZZO-Sovereign-House"
-        }
-      ]
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/chat/sse/route.ts": {
+      "maxDuration": 10
+    },
+    "app/api/sse/*/route.ts": {
+      "maxDuration": 10
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ]
+  }
 }
