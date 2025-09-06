@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sovereignty:check": "node scripts/sovereignty-check.js",
+    "test:deploy": "npm run sovereignty:check && npm run build"
   },
   "dependencies": {
     "@types/pg": "^8.15.5",
