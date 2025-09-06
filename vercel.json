@@ -1,8 +1,9 @@
 {
-  "buildCommand": "cd apps/web && npm install && npm run build",
-  "outputDirectory": "apps/web/.next", 
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": ".next", 
   "framework": "nextjs",
-  "installCommand": "cd apps/web && npm install",
+  "installCommand": "npm install",
+  "cwd": "apps/web",
   "env": {
     "SOVEREIGNTY_ENFORCED": "true",
     "TARGET_COST": "0.001",
