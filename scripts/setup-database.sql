@@ -40,8 +40,19 @@ CREATE TABLE IF NOT EXISTS embeddings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS embeddings_vector_idx ON embeddings 
-USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+DO $$
+BEGIN
+    BEGIN
+        CREATE INDEX IF NOT EXISTS embeddings_vector_hnsw_idx ON embeddings 
+        USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+        RAISE NOTICE 'HNSW index created successfully';
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE NOTICE 'HNSW failed, falling back to ivfflat: %', SQLERRM;
+            CREATE INDEX IF NOT EXISTS embeddings_vector_idx ON embeddings 
+            USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+    END;
+END $$;
 
 CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Crown, Settings, Users, Database, Shield, Activity, AlertTriangle, CheckCircle, Zap, DollarSign } from 'lucide-react'
+import { Crown, Settings, Users, Database, Shield, Activity, AlertTriangle, CheckCircle, Zap, DollarSign, TrendingUp, Server, BarChart3 } from 'lucide-react'
 
 interface SystemMetric {
   name: string
@@ -27,6 +27,19 @@ interface AdminStats {
   errorRate: number
 }
 
+interface LiveAnalytics {
+  requests: { total: number }
+  costs: { total: number }
+  degraded: { ratio: number }
+  providers: Array<{ name: string; sovereignty_score: number }>
+}
+
+interface SovereigntyData {
+  scores: Array<{ vendor_name: string; sovereignty_score: number; lock_in_risk: string }>
+  overallScore: number
+  riskLevel: string
+}
+
 export default function AdminRoom() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [adminCode, setAdminCode] = useState('')
@@ -40,10 +53,12 @@ export default function AdminRoom() {
     systemHealth: 0,
     errorRate: 0
   })
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'users' | 'system' | 'billing'>('overview')
+  const [liveAnalytics, setLiveAnalytics] = useState<LiveAnalytics | null>(null)
+  const [sovereigntyData, setSovereigntyData] = useState<SovereigntyData | null>(null)
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'users' | 'system' | 'billing' | 'sovereignty'>('overview')
+  const [loading, setLoading] = useState(false)
 
   const handleAdminAuth = () => {
-    // Simple admin authentication
     if (adminCode === 'VEGAS2025') {
       setIsAuthenticated(true)
       setAdminCode('')
@@ -53,7 +68,39 @@ export default function AdminRoom() {
     }
   }
 
-  const loadAdminData = () => {
+  const fetchLiveAnalytics = async () => {
+    try {
+      const response = await fetch('/api/analytics')
+      if (response.ok) {
+        const data = await response.json()
+        setLiveAnalytics(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    }
+  }
+
+  const fetchSovereigntyData = async () => {
+    try {
+      const response = await fetch('/api/sovereignty')
+      if (response.ok) {
+        const data = await response.json()
+        setSovereigntyData(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch sovereignty data:', error)
+    }
+  }
+
+  const loadAdminData = async () => {
+    setLoading(true)
+    
+    // Load live data
+    await Promise.all([
+      fetchLiveAnalytics(),
+      fetchSovereigntyData()
+    ])
+
     // Load system metrics
     setMetrics([
       {
@@ -94,7 +141,7 @@ export default function AdminRoom() {
       }
     ])
 
-    // Load user activities
+    // Load user activities (simulated)
     setActivities([
       {
         id: '1',
@@ -130,32 +177,47 @@ export default function AdminRoom() {
       }
     ])
 
-    // Load admin stats
-    setStats({
-      totalUsers: 1247,
-      activeUsers: 89,
-      totalRequests: 156789,
-      revenue: 156.79,
-      systemHealth: 97.3,
-      errorRate: 0.23
-    })
+    setLoading(false)
   }
 
   useEffect(() => {
     if (isAuthenticated) {
+      // Refresh data every 30 seconds
       const interval = setInterval(() => {
-        // Simulate real-time updates
+        fetchLiveAnalytics()
+        fetchSovereigntyData()
+      }, 30000)
+
+      // Real-time stats simulation
+      const statsInterval = setInterval(() => {
         setStats(prev => ({
           ...prev,
-          activeUsers: prev.activeUsers + Math.floor(Math.random() * 3) - 1,
-          totalRequests: prev.totalRequests + Math.floor(Math.random() * 10),
-          revenue: prev.revenue + (Math.random() * 0.01)
+          activeUsers: Math.max(0, prev.activeUsers + Math.floor(Math.random() * 3) - 1),
+          totalRequests: liveAnalytics?.requests.total || prev.totalRequests,
+          revenue: liveAnalytics?.costs.total || prev.revenue,
+          errorRate: (liveAnalytics?.degraded.ratio || 0) * 100
         }))
       }, 5000)
 
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+        clearInterval(statsInterval)
+      }
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, liveAnalytics])
+
+  // Update stats when live data changes
+  useEffect(() => {
+    if (liveAnalytics) {
+      setStats(prev => ({
+        ...prev,
+        totalRequests: liveAnalytics.requests.total,
+        revenue: liveAnalytics.costs.total,
+        errorRate: liveAnalytics.degraded.ratio * 100,
+        systemHealth: Math.max(50, 100 - (liveAnalytics.degraded.ratio * 50))
+      }))
+    }
+  }, [liveAnalytics])
 
   if (!isAuthenticated) {
     return (
@@ -221,19 +283,22 @@ export default function AdminRoom() {
             <h1 className="text-4xl font-bold text-vegas-gold">
               ADMIN ROOM
             </h1>
-            <button
-              onClick={() => setIsAuthenticated(false)}
-              className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 px-3 py-1 rounded-lg text-sm"
-            >
-              Logout
-            </button>
+            <div className="flex items-center gap-2">
+              {loading && <div className="animate-spin w-5 h-5 border-2 border-vegas-gold border-t-transparent rounded-full" />}
+              <button
+                onClick={() => setIsAuthenticated(false)}
+                className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 px-3 py-1 rounded-lg text-sm"
+              >
+                Logout
+              </button>
+            </div>
           </div>
           <p className="text-xl text-desert-sand">
             Supreme Command Center of the Sovereign House
           </p>
         </div>
 
-        {/* Admin Stats */}
+        {/* Live Stats Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
           <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-4 text-center">
             <Users className="w-6 h-6 text-vegas-gold mx-auto mb-2" />
@@ -255,31 +320,32 @@ export default function AdminRoom() {
           
           <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-4 text-center">
             <DollarSign className="w-6 h-6 text-vegas-gold mx-auto mb-2" />
-            <h3 className="text-sm font-semibold text-vegas-gold">Revenue</h3>
-            <p className="text-xl font-bold text-green-500">${stats.revenue.toFixed(2)}</p>
+            <h3 className="text-sm font-semibold text-vegas-gold">Total Cost</h3>
+            <p className="text-xl font-bold text-green-500">${stats.revenue.toFixed(4)}</p>
           </div>
           
           <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-4 text-center">
             <Shield className="w-6 h-6 text-vegas-gold mx-auto mb-2" />
             <h3 className="text-sm font-semibold text-vegas-gold">Health</h3>
-            <p className="text-xl font-bold text-green-500">{stats.systemHealth}%</p>
+            <p className="text-xl font-bold text-green-500">{stats.systemHealth.toFixed(1)}%</p>
           </div>
           
           <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-4 text-center">
             <AlertTriangle className="w-6 h-6 text-vegas-gold mx-auto mb-2" />
-            <h3 className="text-sm font-semibold text-vegas-gold">Error Rate</h3>
-            <p className="text-xl font-bold text-yellow-500">{stats.errorRate}%</p>
+            <h3 className="text-sm font-semibold text-vegas-gold">Degraded</h3>
+            <p className="text-xl font-bold text-yellow-500">{stats.errorRate.toFixed(1)}%</p>
           </div>
         </div>
 
         {/* Tab Navigation */}
         <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-4 mb-8">
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {[
               { id: 'overview', name: 'Overview', icon: <Crown className="w-4 h-4" /> },
               { id: 'users', name: 'Users', icon: <Users className="w-4 h-4" /> },
               { id: 'system', name: 'System', icon: <Settings className="w-4 h-4" /> },
               { id: 'billing', name: 'Billing', icon: <DollarSign className="w-4 h-4" /> },
+              { id: 'sovereignty', name: 'Sovereignty', icon: <Shield className="w-4 h-4" /> },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -320,31 +386,107 @@ export default function AdminRoom() {
               </div>
             </div>
 
-            {/* Recent Activities */}
+            {/* Live Analytics */}
             <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-6">
-              <h2 className="text-2xl font-bold text-vegas-gold mb-6">Recent Activities</h2>
-              <div className="space-y-3">
-                {activities.map((activity) => (
-                  <div key={activity.id} className="p-4 bg-chocolate/40 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-vegas-gold font-medium">{activity.user}</span>
-                          <div className={`w-2 h-2 rounded-full ${
-                            activity.status === 'success' ? 'bg-green-500' : 'bg-red-500'
-                          }`}></div>
-                        </div>
-                        <p className="text-desert-sand text-sm mb-2">{activity.action}</p>
-                        <div className="flex items-center gap-4 text-xs text-desert-sand/60">
-                          <span>{activity.timestamp.toLocaleTimeString()}</span>
-                          <span className="text-green-500">${activity.cost.toFixed(3)}</span>
-                        </div>
-                      </div>
+              <h2 className="text-2xl font-bold text-vegas-gold mb-6">Live Analytics</h2>
+              {liveAnalytics ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-chocolate/40 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-vegas-gold">Total Requests</span>
+                      <span className="text-desert-sand font-bold">{liveAnalytics.requests.total.toLocaleString()}</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="p-4 bg-chocolate/40 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-vegas-gold">Total Costs</span>
+                      <span className="text-green-500 font-bold">${liveAnalytics.costs.total.toFixed(4)}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-chocolate/40 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-vegas-gold">Degraded Ratio</span>
+                      <span className="text-yellow-500 font-bold">{(liveAnalytics.degraded.ratio * 100).toFixed(1)}%</span>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-chocolate/40 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-vegas-gold">Active Providers</span>
+                      <span className="text-desert-sand font-bold">{liveAnalytics.providers.length}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-vegas-gold/60">
+                  <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Loading live analytics...</p>
+                </div>
+              )}
             </div>
+          </div>
+        )}
+
+        {selectedTab === 'sovereignty' && (
+          <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-vegas-gold mb-6">Sovereignty Dashboard</h2>
+            {sovereigntyData ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-chocolate/40 rounded-xl p-6 text-center">
+                    <Shield className="w-12 h-12 text-vegas-gold mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-vegas-gold mb-2">Overall Score</h3>
+                    <p className="text-4xl font-bold text-green-500">{sovereigntyData.overallScore.toFixed(1)}</p>
+                  </div>
+                  <div className="bg-chocolate/40 rounded-xl p-6 text-center">
+                    <AlertTriangle className="w-12 h-12 text-vegas-gold mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-vegas-gold mb-2">Risk Level</h3>
+                    <p className="text-2xl font-bold text-yellow-500">{sovereigntyData.riskLevel}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-semibold text-vegas-gold mb-4">Provider Scores</h3>
+                  <div className="space-y-3">
+                    {sovereigntyData.scores.map((provider, index) => (
+                      <div key={index} className="p-4 bg-chocolate/40 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-vegas-gold font-medium">{provider.vendor_name}</span>
+                            <span className="text-desert-sand/60 text-sm ml-2">({provider.lock_in_risk} risk)</span>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            provider.sovereignty_score >= 0.9 ? 'bg-green-500/20 text-green-500' :
+                            provider.sovereignty_score >= 0.7 ? 'bg-yellow-500/20 text-yellow-500' :
+                            'bg-red-500/20 text-red-500'
+                          }`}>
+                            {(provider.sovereignty_score * 100).toFixed(0)}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {liveAnalytics && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-vegas-gold mb-4">Active Providers</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {liveAnalytics.providers.map((provider, index) => (
+                        <div key={index} className="p-4 bg-chocolate/40 rounded-lg text-center">
+                          <h4 className="text-vegas-gold font-medium">{provider.name}</h4>
+                          <p className="text-2xl font-bold text-green-500">{(provider.sovereignty_score * 100).toFixed(0)}%</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-vegas-gold/60">
+                <Shield className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <p className="text-xl">Loading sovereignty data...</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -370,24 +512,55 @@ export default function AdminRoom() {
 
         {selectedTab === 'billing' && (
           <div className="bg-chocolate/60 backdrop-blur border-2 border-vegas-gold/20 rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-vegas-gold mb-6">Billing & Revenue</h2>
+            <h2 className="text-2xl font-bold text-vegas-gold mb-6">Billing & Cost Analysis</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-chocolate/40 rounded-xl p-6 text-center">
                 <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <h3 className="text-lg font-semibold text-vegas-gold">Today's Revenue</h3>
-                <p className="text-3xl font-bold text-green-500">$45.67</p>
+                <h3 className="text-lg font-semibold text-vegas-gold">Total Costs</h3>
+                <p className="text-3xl font-bold text-green-500">
+                  ${liveAnalytics ? liveAnalytics.costs.total.toFixed(4) : '0.0000'}
+                </p>
               </div>
               <div className="bg-chocolate/40 rounded-xl p-6 text-center">
                 <Zap className="w-8 h-8 text-vegas-gold mx-auto mb-2" />
-                <h3 className="text-lg font-semibold text-vegas-gold">Requests Today</h3>
-                <p className="text-3xl font-bold text-desert-sand">45,670</p>
+                <h3 className="text-lg font-semibold text-vegas-gold">Total Requests</h3>
+                <p className="text-3xl font-bold text-desert-sand">
+                  {liveAnalytics ? liveAnalytics.requests.total.toLocaleString() : '0'}
+                </p>
               </div>
               <div className="bg-chocolate/40 rounded-xl p-6 text-center">
-                <Crown className="w-8 h-8 text-vegas-gold mx-auto mb-2" />
+                <TrendingUp className="w-8 h-8 text-vegas-gold mx-auto mb-2" />
                 <h3 className="text-lg font-semibold text-vegas-gold">Avg per Request</h3>
-                <p className="text-3xl font-bold text-vegas-gold">$0.001</p>
+                <p className="text-3xl font-bold text-vegas-gold">
+                  ${liveAnalytics && liveAnalytics.requests.total > 0 
+                    ? (liveAnalytics.costs.total / liveAnalytics.requests.total).toFixed(6)
+                    : '0.001000'}
+                </p>
               </div>
             </div>
+            
+            {liveAnalytics && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-vegas-gold mb-4">Cost Breakdown</h3>
+                <div className="bg-chocolate/40 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-vegas-gold">Degraded Requests</span>
+                    <span className="text-yellow-500 font-bold">
+                      {(liveAnalytics.degraded.ratio * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-chocolate/60 rounded-full h-3">
+                    <div 
+                      className="bg-yellow-500 h-3 rounded-full transition-all duration-1000"
+                      style={{ width: `${liveAnalytics.degraded.ratio * 100}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-desert-sand/60 text-sm mt-2">
+                    Requests exceeding $0.001 cost threshold
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -407,6 +580,11 @@ export default function AdminRoom() {
           <p className="text-vegas-gold text-lg font-semibold">
             👑 The house always wins - But at $0.001, everyone's a winner 👑
           </p>
+          {liveAnalytics && (
+            <p className="text-desert-sand/60 text-sm mt-2">
+              Live data refreshed every 30 seconds • Last update: {new Date().toLocaleTimeString()}
+            </p>
+          )}
         </div>
       </div>
     </div>
