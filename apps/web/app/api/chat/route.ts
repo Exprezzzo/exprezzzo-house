@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 // Real Ollama integration for SSE streaming with degrade support
 const streamOllamaResponse = async function*(prompt: string, model: string = 'llama3.2') {
-  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+  const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
   const startTime = Date.now();
   
   let totalCost = 0;
@@ -139,6 +139,7 @@ const streamOllamaResponse = async function*(prompt: string, model: string = 'll
   }
 }
 
+// GET method for SSE streaming (query params)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const prompt = searchParams.get('prompt')
@@ -172,7 +173,7 @@ export async function GET(request: NextRequest) {
           message: 'EXPREZZZO Sovereign Chat - Vegas-style streaming at $0.001'
         })
 
-        // Stream the response using your Ollama integration approach
+        // Stream the response using Ollama integration
         let fullResponse = '';
         const responseGenerator = streamOllamaResponse(prompt, model);
         
@@ -225,10 +226,105 @@ export async function GET(request: NextRequest) {
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET',
-      'Access-Control-Allow-Headers': 'Cache-Control',
+      'Access-Control-Allow-Methods': 'GET, POST',
+      'Access-Control-Allow-Headers': 'Cache-Control, Content-Type',
     },
   })
+}
+
+// POST method for JSON responses (messages array)
+export async function POST(request: NextRequest) {
+  try {
+    const { messages, stream = false, model = 'llama3.2' } = await request.json();
+    
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'Messages array is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Get the latest user message
+    const lastMessage = messages[messages.length - 1];
+    const prompt = lastMessage?.content || lastMessage?.message || '';
+
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: 'Message content is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log(`🎰 EXPREZZZO Chat POST: ${prompt.substring(0, 50)}... with model ${model}`);
+
+    // If streaming requested, use SSE
+    if (stream) {
+      // Redirect to GET method with query params for SSE
+      const url = new URL(request.url);
+      url.searchParams.set('prompt', prompt);
+      url.searchParams.set('model', model);
+      return GET(new NextRequest(url, { method: 'GET' }));
+    }
+
+    // Non-streaming: collect all chunks and return as JSON
+    let fullResponse = '';
+    let finalCost = 0;
+    let degraded = false;
+    let finalModel = model;
+    let duration = 0;
+    
+    const responseGenerator = streamOllamaResponse(prompt, model);
+    
+    for await (const chunk of responseGenerator) {
+      if (chunk.text) {
+        fullResponse += chunk.text;
+      }
+      
+      if (chunk.cost !== undefined) {
+        finalCost = chunk.cost;
+      }
+      
+      if (chunk.degraded !== undefined) {
+        degraded = chunk.degraded;
+      }
+      
+      if (chunk.model) {
+        finalModel = chunk.model;
+      }
+      
+      if (chunk.duration !== undefined) {
+        duration = chunk.duration;
+      }
+      
+      if (chunk.done) {
+        break;
+      }
+    }
+
+    return new Response(JSON.stringify({
+      response: fullResponse.trim(),
+      model: finalModel,
+      cost: finalCost,
+      degraded,
+      duration,
+      timestamp: new Date().toISOString(),
+      message: degraded ? 'Cost exceeded $0.001 - using sovereign models only' : 'Complete'
+    }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('🎰 Chat POST error:', error);
+    return new Response(JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
+      degraded: true,
+      cost: 0.001,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 }
 
 // Support CORS preflight
@@ -237,7 +333,7 @@ export async function OPTIONS() {
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Cache-Control, Content-Type',
     },
   })
