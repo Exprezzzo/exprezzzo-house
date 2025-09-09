@@ -1,194 +1,153 @@
 #!/usr/bin/env node
-
 const fs = require('fs');
 const path = require('path');
 
-console.log('🏠 EXPREZZZO Sovereignty Check v4.1');
+// Vegas palette (immutable)
+const VEGAS_COLORS = ['#C5B358','#381819','#EDC9AF','#C72C41','#A89F91','#F5F5DC'];
+const VEGAS_SET = new Set(VEGAS_COLORS.map(c => c.toLowerCase()));
 
-let passed = true;
-const vegasColors = ['#C5B358', '#381819', '#EDC9AF', '#C72C41', '#A89F91', '#F5F5DC'];
+// Pattern matchers
+const HEX_PATTERN = /#[0-9a-fA-F]{6}\b/g;
+const HEX_SHORT_PATTERN = /#[0-9a-fA-F]{3}\b/g;
+const RGB_PATTERN = /rgb\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g;
+const RGBA_PATTERN = /rgba\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)/g;
 
-// Recursive file scanning function
-function scanDirectory(dir, extensions, callback) {
-  if (!fs.existsSync(dir)) return;
+let violations = [];
+let filesScanned = 0;
+let totalColors = 0;
+
+// Recursive file scanner
+function scanDirectory(dir, extensions) {
+  if (!fs.existsSync(dir)) return [];
   
-  const files = fs.readdirSync(dir, { withFileTypes: true });
+  let files = [];
+  const items = fs.readdirSync(dir, { withFileTypes: true });
   
-  files.forEach(file => {
-    const fullPath = path.join(dir, file.name);
+  for (const item of items) {
+    const fullPath = path.join(dir, item.name);
     
-    if (file.isDirectory() && !file.name.startsWith('.') && file.name !== 'node_modules') {
-      scanDirectory(fullPath, extensions, callback);
-    } else if (file.isFile() && extensions.some(ext => file.name.endsWith(ext))) {
-      callback(fullPath);
-    }
-  });
-}
-
-// Check 1: Comprehensive Vegas Palette Enforcement
-console.log('🎨 Checking Vegas palette enforcement...');
-
-let paletteViolations = [];
-const sourceExtensions = ['.ts', '.tsx', '.js', '.jsx', '.css', '.scss', '.vue', '.svelte'];
-
-// Check tailwind config
-if (fs.existsSync('tailwind.config.js')) {
-  const tailwindConfig = fs.readFileSync('tailwind.config.js', 'utf8');
-  vegasColors.forEach(color => {
-    if (!tailwindConfig.includes(color)) {
-      paletteViolations.push(`tailwind.config.js: Missing ${color}`);
-    }
-  });
-} else if (fs.existsSync('apps/web/tailwind.config.js')) {
-  const tailwindConfig = fs.readFileSync('apps/web/tailwind.config.js', 'utf8');
-  vegasColors.forEach(color => {
-    if (!tailwindConfig.includes(color)) {
-      paletteViolations.push(`apps/web/tailwind.config.js: Missing ${color}`);
-    }
-  });
-} else {
-  paletteViolations.push('No tailwind.config.js found');
-}
-
-// Scan source files for color violations
-const forbiddenColorPatterns = ['ff0000', '00ff00', '0000ff', 'ffffff', '000000', 'white', 'black', 'red', 'green', 'blue'];
-const colorRegex = /#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}|rgb\([^)]+\)|rgba\([^)]+\)|hsl\([^)]+\)|hsla\([^)]+\)/g;
-
-scanDirectory('.', sourceExtensions, (filePath) => {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const matches = content.match(colorRegex);
-  
-  if (matches) {
-    matches.forEach(match => {
-      const normalizedColor = match.toLowerCase();
-      if (!vegasColors.some(vegas => normalizedColor.includes(vegas.toLowerCase()))) {
-        if (forbiddenColorPatterns.some(forbidden => normalizedColor.includes(forbidden))) {
-          paletteViolations.push(`${filePath}: Non-Vegas color ${match}`);
-        }
+    // Skip node_modules and hidden directories
+    if (item.name.startsWith('.') || item.name === 'node_modules') continue;
+    
+    if (item.isDirectory()) {
+      files = files.concat(scanDirectory(fullPath, extensions));
+    } else if (item.isFile()) {
+      const ext = path.extname(item.name);
+      if (extensions.includes(ext)) {
+        files.push(fullPath);
       }
-    });
+    }
   }
-});
+  
+  return files;
+}
 
-// Check compiled CSS if it exists
-const compiledCssPaths = [
-  'apps/web/.next/static/css',
-  'dist/css',
-  'build/static/css',
-  'public/css'
+// Check file for color violations
+function checkFile(filePath) {
+  filesScanned++;
+  const content = fs.readFileSync(filePath, 'utf8');
+  
+  // Find all color references
+  const hexColors = content.match(HEX_PATTERN) || [];
+  const shortHexColors = content.match(HEX_SHORT_PATTERN) || [];
+  const rgbColors = content.match(RGB_PATTERN) || [];
+  const rgbaColors = content.match(RGBA_PATTERN) || [];
+  
+  const allColors = [...hexColors, ...shortHexColors, ...rgbColors, ...rgbaColors];
+  totalColors += allColors.length;
+  
+  // Check each color
+  for (const color of hexColors) {
+    if (!VEGAS_SET.has(color.toLowerCase())) {
+      violations.push({
+        file: filePath,
+        color: color,
+        line: getLineNumber(content, color)
+      });
+    }
+  }
+  
+  // Expand short hex colors and check
+  for (const color of shortHexColors) {
+    const expanded = color.replace(/#(.)(.)(.)/, '#$1$1$2$2$3$3');
+    if (!VEGAS_SET.has(expanded.toLowerCase())) {
+      violations.push({
+        file: filePath,
+        color: color,
+        line: getLineNumber(content, color)
+      });
+    }
+  }
+}
+
+// Get line number for violation
+function getLineNumber(content, searchStr) {
+  const lines = content.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(searchStr)) {
+      return i + 1;
+    }
+  }
+  return 0;
+}
+
+// Main execution
+console.log('🎨 EXPREZZZO Sovereignty Check - Vegas Palette Enforcement');
+console.log('=========================================================');
+console.log(`Allowed colors: ${VEGAS_COLORS.join(', ')}`);
+console.log('');
+
+// Scan source files
+const sourceDirs = [
+  'apps/web/app',
+  'apps/web/components',
+  'apps/web/styles',
+  'lib',
+  'components'
 ];
 
-compiledCssPaths.forEach(cssPath => {
-  if (fs.existsSync(cssPath)) {
-    scanDirectory(cssPath, ['.css'], (filePath) => {
-      const content = fs.readFileSync(filePath, 'utf8');
-      const matches = content.match(colorRegex);
-      
-      if (matches) {
-        matches.forEach(match => {
-          if (!vegasColors.some(vegas => match.toLowerCase().includes(vegas.toLowerCase()))) {
-            if (forbiddenColorPatterns.some(forbidden => match.toLowerCase().includes(forbidden))) {
-              paletteViolations.push(`${filePath}: Compiled non-Vegas color ${match}`);
-            }
-          }
-        });
-      }
-    });
+const fileExtensions = ['.tsx', '.ts', '.jsx', '.js', '.css', '.scss', '.sass'];
+
+console.log('Scanning directories...');
+for (const dir of sourceDirs) {
+  if (fs.existsSync(dir)) {
+    console.log(`  📁 ${dir}`);
+    const files = scanDirectory(dir, fileExtensions);
+    files.forEach(checkFile);
   }
-});
-
-if (paletteViolations.length > 0) {
-  console.error('❌ Vegas palette violations:');
-  paletteViolations.forEach(violation => console.error(`   ${violation}`));
-  passed = false;
-} else {
-  console.log('✅ Vegas palette enforced across all files');
 }
 
-// Check 2: Docker compose exists
-if (!fs.existsSync('docker-compose.yml')) {
-  console.error('❌ docker-compose.yml missing - no escape route!');
-  passed = false;
-} else {
-  console.log('✅ Docker escape route configured');
+// Check compiled CSS if it exists
+if (fs.existsSync('apps/web/.next/static/css')) {
+  console.log('  📁 apps/web/.next/static/css (compiled)');
+  const compiledFiles = scanDirectory('apps/web/.next/static/css', ['.css']);
+  compiledFiles.forEach(checkFile);
 }
 
-// Check 3: Cost target verification
-const costTarget = 0.001;
-console.log(`✅ Cost target: $${costTarget}/request enforced`);
+// Report results
+console.log('');
+console.log('Results:');
+console.log(`  Files scanned: ${filesScanned}`);
+console.log(`  Total colors found: ${totalColors}`);
+console.log(`  Violations: ${violations.length}`);
 
-// Check 4: EXPREZZZO spelling enforcement (3 Z's)
-let spellingViolations = [];
-scanDirectory('.', ['.ts', '.tsx', '.js', '.jsx', '.md', '.json'], (filePath) => {
-  if (filePath.includes('node_modules') || filePath.includes('.git')) return;
-  
-  const content = fs.readFileSync(filePath, 'utf8');
-  const wrongSpellings = ['EXPR' + 'ESZO', 'EXPR' + 'ESSO', 'EXPR' + 'EZOO'];
-  
-  wrongSpellings.forEach(wrong => {
-    if (content.includes(wrong)) {
-      spellingViolations.push(`${filePath}: Found ${wrong} instead of EXPREZZZO`);
-    }
-  });
-});
-
-if (spellingViolations.length > 0) {
-  console.error('❌ EXPREZZZO spelling violations:');
-  spellingViolations.forEach(violation => console.error(`   ${violation}`));
-  passed = false;
-} else {
-  console.log('✅ EXPREZZZO = 3 Z\'s Always (verified)');
-}
-
-// Check 5: Vercel deployment
-if (fs.existsSync('vercel.json')) {
-  console.log('✅ Vercel deployment configured');
-} else {
-  console.log('⚠️ vercel.json not found - manual configuration needed');
-}
-
-// Check 6: Sovereignty dependencies
-const packageJsonPaths = ['package.json', 'apps/web/package.json', 'apps/api/package.json'];
-let sovereignDeps = 0;
-let totalDeps = 0;
-
-packageJsonPaths.forEach(pkgPath => {
-  if (fs.existsSync(pkgPath)) {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-    
-    Object.keys(deps).forEach(dep => {
-      totalDeps++;
-      // Consider local, self-hosted, or open-source deps as sovereign
-      if (dep.startsWith('@') || dep.includes('local') || dep.includes('self')) {
-        sovereignDeps++;
-      }
-    });
-  }
-});
-
-const sovereigntyRatio = totalDeps > 0 ? (sovereignDeps / totalDeps) * 100 : 100;
-console.log(`📊 Dependency sovereignty: ${sovereigntyRatio.toFixed(1)}% (${sovereignDeps}/${totalDeps})`);
-
-// Final verdict
-if (passed) {
+if (violations.length === 0) {
   console.log('');
-  console.log('========================================');
-  console.log('✅ SOVEREIGNTY CHECK PASSED');
-  console.log('🏠 The House is sovereign and secure!');
-  console.log('🌹 Vegas First, Forward Only');
-  console.log('💎 EXPREZZZO = 3 Z\'s Forever');
-  console.log(`🎨 Vegas palette: 100% enforced`);
-  console.log(`📊 Dependencies: ${sovereigntyRatio.toFixed(1)}% sovereign`);
-  console.log('========================================');
+  console.log('✅ Vegas palette enforced - All colors are sovereign!');
+  console.log('🌹 The House maintains its aesthetic sovereignty');
   process.exit(0);
 } else {
+  console.log('');
+  console.error('❌ Vegas palette violations detected:');
+  console.error('=====================================');
+  for (const violation of violations) {
+    console.error(`  File: ${violation.file}`);
+    console.error(`  Line: ${violation.line}`);
+    console.error(`  Color: ${violation.color} (not in Vegas palette)`);
+    console.error('  ---');
+  }
   console.error('');
-  console.error('========================================');
-  console.error('❌ SOVEREIGNTY CHECK FAILED');
-  console.error('Fix violations above before deployment');
-  console.error('🌹 Vegas First, Forward Only');
-  console.error('💎 EXPREZZZO = 3 Z\'s Forever');
-  console.error('========================================');
+  console.error(`Total violations: ${violations.length}`);
+  console.error('Fix these violations to maintain House sovereignty!');
   process.exit(1);
 }

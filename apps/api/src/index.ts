@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import axios from 'axios'
 
-const MAX_COST_USD = 0.001 as const;
+const MAX_COST_USD = 0.0002 as const;
 const USD_PER_TOKEN_PROVISIONAL = 0.000002 as const;
 const estimateTokens = (s: string) => Math.ceil((s?.length ?? 0) / 4);
 const estimateProjectedCostUSD = (input: string) => estimateTokens(input) * USD_PER_TOKEN_PROVISIONAL;
@@ -105,5 +105,5 @@ app.post('/api/search', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🏠 EXPREZZZO API running on port ${PORT}`)
   console.log(`🔐 Sovereignty: ENFORCED`)
-  console.log(`💰 Target: $0.001/request`)
+  console.log(`💰 Target: $0.0002/request`)
 })

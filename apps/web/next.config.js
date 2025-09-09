@@ -24,7 +24,7 @@ const nextConfig = {
           },
           {
             key: 'X-Cost-Per-Request',
-            value: '$0.001',
+            value: '$0.0002',
           },
         ],
       },

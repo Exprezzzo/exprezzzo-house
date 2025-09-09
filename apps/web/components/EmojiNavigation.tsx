@@ -80,7 +80,7 @@ export default function EmojiNavigation() {
               <span className="text-vegas-gold font-medium">Sovereign</span>
             </div>
             <div className="text-xs text-desert-sand/80 hidden lg:block">
-              <div>$0.001/request</div>
+              <div>$0.0002/request</div>
               <div className="text-green-500">Vegas Ready</div>
             </div>
           </div>

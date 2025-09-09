@@ -40,7 +40,7 @@ export async function GET() {
       noVendorLock: true,     // No cloud dependencies
       openSource: true,       // Using open source models
       selfHosted: true,       // Running on own infrastructure
-      costControl: true,      // Fixed $0.001 pricing
+      costControl: true,      // Fixed $0.0002 pricing
       dataPortability: true   // Full data export capability
     }
 
@@ -57,7 +57,7 @@ export async function GET() {
       sovereignty_score: Math.round(sovereigntyScore * 100),
       services: services,
       metrics: sovereigntyMetrics,
-      cost_per_request: 0.001,
+      cost_per_request: 0.0002,
       vegas_mode: true,
       house_status: services.database && services.cache && services.llm ? 'OPERATIONAL' : 'DEGRADED',
       timestamp: new Date().toISOString(),

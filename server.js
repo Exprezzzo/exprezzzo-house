@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * EXPREZZZO Sovereign House - Production Server
- * Vegas-first, sovereign-always, $0.001/request
+ * Vegas-first, sovereign-always, $0.0002/request
  */
 
 const { createServer } = require('http')
@@ -23,7 +23,7 @@ app.prepare().then(() => {
       
       // Add EXPREZZZO headers
       res.setHeader('X-Powered-By', 'EXPREZZZO-Sovereign-House')
-      res.setHeader('X-Cost-Per-Request', '$0.001')
+      res.setHeader('X-Cost-Per-Request', '$0.0002')
       res.setHeader('X-Vegas-First', 'true')
       
       await handle(req, res, parsedUrl)
@@ -42,7 +42,7 @@ app.prepare().then(() => {
 🎰 EXPREZZZO SOVEREIGN HOUSE LIVE! 🎰
 ======================================
 🏠 Server: http://${hostname}:${port}
-💰 Cost: $0.001 per request
+💰 Cost: $0.0002 per request
 🛡️ Mode: ${dev ? 'Development' : 'Production'}
 🌹 Vegas First, Sovereignty Always
 ======================================

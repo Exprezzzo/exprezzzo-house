@@ -1,21 +1,40 @@
-exprezzzo.house {
-  reverse_proxy /api/* exprezzzo-house:3000
-  reverse_proxy /* exprezzzo-house:3000
-  
-  header {
-    X-Sovereignty "ENFORCED"
-    X-Vegas "GOLD"
-    X-Cost-Per-Request "$0.001"
-    X-Powered-By "EXPREZZZO-Sovereign-House"
-  }
-  
-  # Enable compression
-  encode gzip
-  
-  # Security headers
-  header {
-    X-Frame-Options "SAMEORIGIN"
-    X-Content-Type-Options "nosniff"
-    Referrer-Policy "strict-origin-when-cross-origin"
-  }
+{
+    admin 0.0.0.0:2019
+    log {
+        output file /var/log/caddy/access.log
+        format json
+        level INFO
+    }
+}
+
+:80 {
+    # Sovereignty headers
+    header {
+        X-Sovereignty "EXPREZZZO House v4.1"
+        X-Cost-Target "0.0002"
+        X-Vegas-Mode "Active"
+        -Server
+    }
+    
+    # Reverse proxy to services
+    handle /api/ollama* {
+        reverse_proxy ollama:11434
+    }
+    
+    handle /api/postgres* {
+        respond "Direct DB access forbidden" 403
+    }
+    
+    handle {
+        reverse_proxy localhost:3000
+    }
+    
+    # Rate limiting
+    rate_limit {
+        zone dynamic {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
 }

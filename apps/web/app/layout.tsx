@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'EXPREZZZO Sovereign House',
-  description: 'Vegas-first, sovereign-always, $0.001/request immutable',
+  description: 'Vegas-first, sovereign-always, $0.0002/request immutable',
 }
 
 export default function RootLayout({
@@ -30,7 +30,7 @@ export default function RootLayout({
               <div className="flex gap-4 items-center">
                 <span className="text-green-500">● Sovereign</span>
                 <span className="bg-vegas-gold text-chocolate px-3 py-1 rounded-full font-bold">
-                  $0.001/req
+                  $0.0002/req
                 </span>
               </div>
             </div>

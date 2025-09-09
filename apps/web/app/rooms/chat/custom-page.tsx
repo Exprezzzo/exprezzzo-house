@@ -16,7 +16,7 @@ export default function CustomChatRoom() {
       role: 'user',
       content: input,
       timestamp: new Date(),
-      cost: 0.001
+      cost: 0.0002
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -32,7 +32,7 @@ export default function CustomChatRoom() {
         body: JSON.stringify({
           message: userInput,
           model: 'llama3.2',
-          degrade: true // Enable $0.001 degrade mode
+          degrade: true // Enable $0.0002 degrade mode
         })
       });
 
@@ -43,7 +43,7 @@ export default function CustomChatRoom() {
         role: 'assistant',
         content: '',
         timestamp: new Date(),
-        cost: 0.001
+        cost: 0.0002
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -100,7 +100,7 @@ export default function CustomChatRoom() {
       
       {degraded && (
         <div className="bg-[#C72C41] text-white p-2 mb-4 rounded">
-          🎰 SOVEREIGN MODE: All requests processed at $0.001 - Vegas-style efficiency!
+          🎰 SOVEREIGN MODE: All requests processed at $0.0002 - Vegas-style efficiency!
         </div>
       )}
       
@@ -109,7 +109,7 @@ export default function CustomChatRoom() {
           <div className="text-center text-[#A89F91] mt-20">
             <div className="text-4xl mb-4">🎲</div>
             <p>Welcome to the Sovereign Chat Room</p>
-            <p className="text-sm mt-2">Every message costs exactly $0.001</p>
+            <p className="text-sm mt-2">Every message costs exactly $0.0002</p>
           </div>
         ) : (
           messages.map((msg, i) => (
@@ -148,7 +148,7 @@ export default function CustomChatRoom() {
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
           disabled={streaming}
-          className="flex-1 bg-[#1a1a1a] border-2 border-[#C5B358] text-[#C5B358] p-3 rounded focus:border-[#EDC9AF] focus:outline-none disabled:opacity-50"
+          className="flex-1 bg-[#381819] border-2 border-[#C5B358] text-[#C5B358] p-3 rounded focus:border-[#EDC9AF] focus:outline-none disabled:opacity-50"
           placeholder="Type your message... (Press Enter to send)"
         />
         <button 
@@ -163,7 +163,7 @@ export default function CustomChatRoom() {
       <div className="mt-4 flex justify-between items-center text-sm">
         <div className="text-[#A89F91]">
           Session Cost: <span className="text-[#C5B358] font-mono">${totalCost.toFixed(3)}</span> | 
-          Target: <span className="text-green-500">$0.001/message</span>
+          Target: <span className="text-green-500">$0.0002/message</span>
         </div>
         <div className="text-[#A89F91]">
           Messages: {messages.length} | 

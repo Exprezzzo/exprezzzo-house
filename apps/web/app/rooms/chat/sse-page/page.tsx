@@ -12,7 +12,7 @@ export default function SSEChatRoom() {
     if (!input.trim() || streaming) return;
     
     setStreaming(true);
-    setMessages(prev => [...prev, { role: 'user', content: input, cost: 0.001, timestamp: new Date() }]);
+    setMessages(prev => [...prev, { role: 'user', content: input, cost: 0.0002, timestamp: new Date() }]);
     const userInput = input;
     setInput('');
     setTotalCost(prev => prev + 0.001);
@@ -23,7 +23,7 @@ export default function SSEChatRoom() {
     
     // Add initial AI message placeholder
     const aiMessageIndex = messages.length + 1;
-    setMessages(prev => [...prev, { role: 'assistant', content: '', cost: 0.001, timestamp: new Date() }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: '', cost: 0.0002, timestamp: new Date() }]);
     
     eventSource.onmessage = (event) => {
       try {
@@ -91,16 +91,16 @@ export default function SSEChatRoom() {
       {degraded && (
         <div className="bg-[#C72C41] text-white p-2 mb-4 rounded flex items-center gap-2">
           <span>🎰</span>
-          <span>SOVEREIGN MODE: All requests processed at $0.001 - Vegas guarantees!</span>
+          <span>SOVEREIGN MODE: All requests processed at $0.0002 - Vegas guarantees!</span>
         </div>
       )}
       
-      <div className="border-2 border-[#C5B358] rounded-lg p-6 h-[60vh] overflow-y-auto mb-4 bg-[#2a1415]">
+      <div className="border-2 border-[#C5B358] rounded-lg p-6 h-[60vh] overflow-y-auto mb-4 bg-[#381819]">
         {messages.length === 0 ? (
           <div className="text-center text-[#A89F91] mt-20">
             <div className="text-4xl mb-4">🎲</div>
             <p className="text-xl mb-2">Welcome to the SSE Chat Room</p>
-            <p className="text-sm">Real-time streaming at $0.001 per message</p>
+            <p className="text-sm">Real-time streaming at $0.0002 per message</p>
             <p className="text-xs mt-2 text-[#C5B358]">Powered by Server-Sent Events</p>
           </div>
         ) : (
@@ -152,7 +152,7 @@ export default function SSEChatRoom() {
             onKeyPress={handleKeyPress}
             disabled={streaming}
             rows={3}
-            className="w-full bg-[#1a1a1a] border-2 border-[#C5B358] text-[#C5B358] p-3 rounded focus:border-[#EDC9AF] focus:outline-none disabled:opacity-50 resize-none"
+            className="w-full bg-[#381819] border-2 border-[#C5B358] text-[#C5B358] p-3 rounded focus:border-[#EDC9AF] focus:outline-none disabled:opacity-50 resize-none"
             placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
           />
         </div>
@@ -175,7 +175,7 @@ export default function SSEChatRoom() {
       <div className="mt-4 flex justify-between items-center text-sm border-t border-[#C5B358]/30 pt-4">
         <div className="text-[#A89F91] space-x-4">
           <span>Session Cost: <span className="text-[#C5B358] font-mono font-bold">${totalCost.toFixed(3)}</span></span>
-          <span>Target: <span className="text-green-500">$0.001/msg</span></span>
+          <span>Target: <span className="text-green-500">$0.0002/msg</span></span>
         </div>
         <div className="text-[#A89F91] space-x-4">
           <span>Messages: <span className="text-[#C5B358]">{messages.length}</span></span>
@@ -187,7 +187,7 @@ export default function SSEChatRoom() {
       </div>
       
       <div className="mt-4 text-center text-[#A89F91] text-xs">
-        🎰 Real-time Vegas AI - Where every token counts at $0.001! 🎰
+        🎰 Real-time Vegas AI - Where every token counts at $0.0002! 🎰
       </div>
     </div>
   );

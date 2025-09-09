@@ -7,7 +7,7 @@ export interface SovereigntyMetrics {
     cache: boolean;        // ⚠️ Fix: Switch to Redis
     vectors: boolean;      // ❌ Fix: Add /api/embed
   };
-  costPerRequest: number;  // Current: $0.001, Target: $0.00001
+  costPerRequest: number;  // Current: $0.0002, Target: $0.00001
   escapeVelocity: number;  // Hours to migrate (Target: <24)
   degraded: boolean;       // Current: true, Target: false
   brandCompliance: {
@@ -86,7 +86,7 @@ export async function calculateSovereigntyScore(): Promise<SovereigntyMetrics> {
   const degraded = !ollamaWorking || totalScore < 80;
 
   // Cost calculation (lower when more services working locally)
-  const baseCost = 0.001;
+  const baseCost = 0.0002;
   const costReduction = workingServices * 0.0002; // $0.0002 reduction per working service
   const costPerRequest = Math.max(0.00001, baseCost - costReduction);
 

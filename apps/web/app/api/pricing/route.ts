@@ -40,13 +40,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate cost based on request type and degrade flag
-    let baseCost = 0.001 // $0.001 base cost
+    let baseCost = 0.0002 // $0.0002 base cost
     
-    // Pricing tiers (all degraded to $0.001 when degrade=true)
+    // Pricing tiers (all degraded to $0.0002 when degrade=true)
     const pricingTiers: { [key: string]: number } = {
-      'chat': 0.001,
+      'chat': 0.0002,
       'image': 0.002,
-      'code': 0.001,
+      'code': 0.0002,
       'document': 0.000, // Free for library access
       'admin': 0.000     // Free for admin operations
     }
@@ -139,16 +139,16 @@ export async function GET(request: NextRequest) {
         avgRevenuePerRequest: parseFloat(systemRevenue) / Math.max(parseInt(systemRequests), 1)
       },
       pricing: {
-        chat: 0.001,
+        chat: 0.0002,
         image: 0.002,
-        code: 0.001,
+        code: 0.0002,
         document: 0.000,
         admin: 0.000
       },
       degrade: {
         enabled: true,
-        targetCost: 0.001,
-        description: "All requests degraded to $0.001 for sovereign operation"
+        targetCost: 0.0002,
+        description: "All requests degraded to $0.0002 for sovereign operation"
       }
     })
 

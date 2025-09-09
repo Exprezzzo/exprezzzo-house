@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 const DEMO_RESPONSES = [
   "🌹 The House always wins, and we're building the ultimate House!",
   "Vegas taught me: Ship fast, iterate faster, win biggest.",
-  "We're running at $0.001 vs BigTech's $0.15 - that's disruption!",
+  "We're running at $0.0002 vs BigTech's $0.15 - that's disruption!",
   "Privacy-first, sovereignty always, your data stays YOUR data."
 ];
 

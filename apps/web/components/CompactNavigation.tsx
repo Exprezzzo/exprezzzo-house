@@ -29,7 +29,7 @@ export default function CompactNavigation() {
               className={`px-2 py-2 md:px-4 md:py-2 rounded-lg transition-all hover:scale-105 ${
                 pathname === room.path 
                   ? 'bg-[#C5B358] text-[#381819] shadow-lg' 
-                  : 'text-[#C5B358] hover:bg-[#1a1a1a] hover:text-[#EDC9AF]'
+                  : 'text-[#C5B358] hover:bg-[#381819] hover:text-[#EDC9AF]'
               }`}
               title={room.name}
             >
@@ -44,7 +44,7 @@ export default function CompactNavigation() {
         {/* Status Badge */}
         <div className="hidden md:flex items-center gap-2 bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-xs">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span>$0.001/req</span>
+          <span>$0.0002/req</span>
         </div>
       </div>
     </nav>

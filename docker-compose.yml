@@ -1,96 +1,148 @@
 version: '3.8'
 
-services:
-  exprezzzo-house:
-    build: .
-    container_name: exprezzzo-sovereign-house
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - SOVEREIGNTY_ENFORCED=true
-      - TARGET_COST=0.001
-      - POSTGRES_URL=postgres://sovereign:vegas@postgres:5432/exprezzzo
-      - REDIS_URL=redis://redis:6379
-      - OLLAMA_URL=http://ollama:11434
-    depends_on:
-      - postgres
-      - redis
-      - ollama
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
+# Network configuration for inter-service communication
+networks:
+  exprezzzo-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
 
+services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: exprezzzo-postgres
+    hostname: postgres
     environment:
-      - POSTGRES_USER=sovereign
-      - POSTGRES_PASSWORD=vegas
-      - POSTGRES_DB=exprezzzo
+      POSTGRES_USER: exprezzzo
+      POSTGRES_PASSWORD: sovereign
+      POSTGRES_DB: exprezzzo_house
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-    networks:
-      - exprezzzo-network
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backups/postgres:/backups
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U exprezzzo -d exprezzzo_house"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      exprezzzo-net:
+        ipv4_address: 172.25.0.2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     image: redis:7-alpine
     container_name: exprezzzo-redis
+    hostname: redis
     ports:
       - "6379:6379"
+    command: >
+      redis-server
+      --save 60 1
+      --save 300 10
+      --save 900 100
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 300
     volumes:
       - redis_data:/data
-    networks:
-      - exprezzzo-network
+      - ./backups/redis:/backups
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      exprezzzo-net:
+        ipv4_address: 172.25.0.3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   ollama:
     image: ollama/ollama:latest
     container_name: exprezzzo-ollama
+    hostname: ollama
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    networks:
-      - exprezzzo-network
+      - ./models:/models
     restart: unless-stopped
     environment:
-      - OLLAMA_HOST=0.0.0.0
+      OLLAMA_HOST: 0.0.0.0
+      OLLAMA_ORIGINS: "*"
+      OLLAMA_MAX_LOADED_MODELS: 3
+      OLLAMA_NUM_PARALLEL: 4
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      exprezzzo-net:
+        ipv4_address: 172.25.0.4
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
 
   caddy:
     image: caddy:alpine
     container_name: exprezzzo-caddy
+    hostname: caddy
     ports:
       - "80:80"
       - "443:443"
+      - "2019:2019"  # Caddy admin API
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    networks:
-      - exprezzzo-network
+      - ./logs/caddy:/var/log/caddy
     restart: unless-stopped
     depends_on:
-      - exprezzzo-house
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    networks:
+      exprezzzo-net:
+        ipv4_address: 172.25.0.5
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:2019/config/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
-    name: exprezzzo_postgres_data
+    driver: local
   redis_data:
-    name: exprezzzo_redis_data
+    driver: local
   ollama_data:
-    name: exprezzzo_ollama_data
+    driver: local
   caddy_data:
-    name: exprezzzo_caddy_data
+    driver: local
   caddy_config:
-    name: exprezzzo_caddy_config
-
-networks:
-  exprezzzo-network:
-    name: exprezzzo-network
-    driver: bridge
+    driver: local

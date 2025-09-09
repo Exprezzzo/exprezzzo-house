@@ -189,7 +189,7 @@ app.post('/api/chat', enforceSovereignty, async (req, res) => {
             prompt: message,
             system: `You are in the ${room} room of the EXPREZZZO Sovereign House. 
                      Maintain sovereignty, enforce brand (Vegas Gold #C5B358, Chocolate #381819).
-                     Target: $0.001/request. No vendor lock-in.`,
+                     Target: $0.0002/request. No vendor lock-in.`,
             stream: stream
         });
 

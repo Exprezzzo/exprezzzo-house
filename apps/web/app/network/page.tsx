@@ -13,7 +13,7 @@ export default function NetworkRoom() {
         <ul className="mt-4 space-y-2 text-dust">
           <li>• Sovereignty enforcement active</li>
           <li>• Vegas branding applied</li>
-          <li>• $0.001/request guard enabled</li>
+          <li>• $0.0002/request guard enabled</li>
           <li>• Escape protocols ready</li>
         </ul>
       </div>

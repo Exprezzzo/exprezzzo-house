@@ -22,7 +22,7 @@ export async function GET() {
     return NextResponse.json({
       sovereignty_score: 0,
       services: { ollama: false, database: false, cache: false, vectors: false },
-      cost_per_request: 0.001,
+      cost_per_request: 0.0002,
       escape_velocity_hours: 24,
       degraded: true,
       brand_compliance: { threeZs: true, vegasColors: true },
