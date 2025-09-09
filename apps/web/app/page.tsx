@@ -33,7 +33,7 @@ export default function Home() {
             <Zap className="w-5 h-5 text-vegas-gold" />
             Vegas-First Architecture
           </p>
-          <p className="text-vegas-gold font-bold">$0.001 per request</p>
+          <p className="text-vegas-gold font-bold">$0.0002 per request</p>
           <p className="text-sm">Sovereign • Always • Immutable</p>
         </div>
 

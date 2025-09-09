@@ -13,10 +13,15 @@ CREATE TABLE IF NOT EXISTS sovereignty_scores (
 
 CREATE TABLE IF NOT EXISTS request_log (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    route VARCHAR(255),
+    method VARCHAR(10),
+    provider VARCHAR(100),
     room VARCHAR(100),
     model_used VARCHAR(100),
     tokens_used INTEGER,
     estimated_cost DECIMAL(10,6),
+    latency_ms INTEGER,
+    degraded BOOLEAN DEFAULT false,
     sovereignty_preserved BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -40,8 +45,19 @@ CREATE TABLE IF NOT EXISTS embeddings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS embeddings_vector_idx ON embeddings 
-USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+DO $$
+BEGIN
+    BEGIN
+        CREATE INDEX IF NOT EXISTS embeddings_vector_hnsw_idx ON embeddings 
+        USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+        RAISE NOTICE 'HNSW index created successfully';
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE NOTICE 'HNSW failed, falling back to ivfflat: %', SQLERRM;
+            CREATE INDEX IF NOT EXISTS embeddings_vector_idx ON embeddings 
+            USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+    END;
+END $$;
 
 CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -58,9 +74,19 @@ CREATE TABLE IF NOT EXISTS providers (
     name VARCHAR(100) NOT NULL UNIQUE,
     type VARCHAR(50),
     enabled BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
     api_key TEXT,
     config JSONB,
     sovereignty_score DECIMAL(3,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS metrics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    metric_type VARCHAR(50),
+    metric_name VARCHAR(100),
+    metric_value DECIMAL(12,6),
+    tags JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -87,10 +113,10 @@ INSERT INTO house_rooms (room_name, room_type, brand_tokens) VALUES
 ('Admin', 'control', '{"primary": "#381819", "secondary": "#C5B358"}')
 ON CONFLICT (room_name) DO NOTHING;
 
-INSERT INTO providers (name, type, enabled, sovereignty_score) VALUES
-('Ollama', 'sovereign', true, 1.00),
-('Groq', 'flash', false, 0.75),
-('Together', 'flash', false, 0.70),
-('Fireworks', 'flash', false, 0.68),
-('OpenAI', 'premium', false, 0.30)
+INSERT INTO providers (name, type, enabled, is_active, sovereignty_score) VALUES
+('Ollama', 'sovereign', true, true, 1.00),
+('Groq', 'flash', false, true, 0.75),
+('Together', 'flash', false, true, 0.70),
+('Fireworks', 'flash', false, true, 0.68),
+('OpenAI', 'premium', false, true, 0.30)
 ON CONFLICT (name) DO NOTHING;

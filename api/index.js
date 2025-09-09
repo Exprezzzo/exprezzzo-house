@@ -118,7 +118,7 @@ export default function handler(req, res) {
         "Welcome to the EXPREZZZO Sovereign House! This is a demo deployment on Vercel.",
         "For full functionality with local LLMs, deploy using Docker: `docker-compose up -d`",
         "Sovereignty maintained: This demo preserves the Vegas-first, local-first architecture.",
-        "Cost target: $0.001/request maximum - achieved through efficient sovereign infrastructure.",
+        "Cost target: $0.0002/request maximum - achieved through efficient sovereign infrastructure.",
         "The Rose blooms in the desert. Vegas First. Sovereign Always. 🌹"
       ];
 

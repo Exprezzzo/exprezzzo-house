@@ -5,7 +5,7 @@ import CompactNavigation from '@/components/CompactNavigation'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'EXPREZZZO House - Sovereign AI at $0.001',
+  title: 'EXPREZZZO House - Sovereign AI at $0.0002',
   description: 'The Rose Blooms in the Desert 🌹 - Vegas-first, sovereign-always',
 }
 
@@ -27,7 +27,7 @@ export default function RootLayout({
           <div className="container mx-auto px-4">
             <div className="flex justify-center items-center gap-6 text-sm text-[#EDC9AF]">
               <span>© 2025 EXPREZZZO Sovereign House</span>
-              <span className="text-green-500">● $0.001/req</span>
+              <span className="text-green-500">● $0.0002/req</span>
               <span>🌹 The Rose Blooms in Vegas 🌹</span>
             </div>
           </div>

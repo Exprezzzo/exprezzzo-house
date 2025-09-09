@@ -45,3 +45,8 @@ exprezzzo-house-deploy.tar.gz
 # Nested apps
 apps/web/node_modules/
 apps/web/.next/
+
+# Docker volumes and data
+data/postgres/
+data/redis/
+data/ollama/

@@ -2,6 +2,11 @@ import express from 'express'
 import cors from 'cors'
 import axios from 'axios'
 
+const MAX_COST_USD = 0.0002 as const;
+const USD_PER_TOKEN_PROVISIONAL = 0.000002 as const;
+const estimateTokens = (s: string) => Math.ceil((s?.length ?? 0) / 4);
+const estimateProjectedCostUSD = (input: string) => estimateTokens(input) * USD_PER_TOKEN_PROVISIONAL;
+
 const app = express()
 const PORT = process.env.PORT || 4000
 
@@ -41,25 +46,26 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     // Calculate cost and select provider
-    const estimatedCost = messages.length * 0.0002
-    let provider = 'ollama'
-    
-    if (estimatedCost > 0.001) {
-      // Degrade to cheaper model
-      provider = 'ollama'
-    }
+    const inputText = messages.map((m: any) => m.content || '').join(' ')
+    const estimatedCost = estimateProjectedCostUSD(inputText)
+    const degraded = estimatedCost > MAX_COST_USD
+    let provider = degraded ? 'ollama' : 'openai'
 
     // Simulate streaming response
     const response = `This is a sovereign response from EXPREZZZO House using ${provider}.`
     
     if (stream) {
+      // SSE response with degraded flag
+      res.write(`data: ${JSON.stringify({ degraded, provider, estimatedCost })}\n\n`)
       for (const char of response) {
-        res.write(char)
+        res.write(`data: ${JSON.stringify({ content: char })}\n\n`)
         await new Promise(resolve => setTimeout(resolve, 20))
       }
+      res.write(`data: [DONE]\n\n`)
       res.end()
     } else {
-      res.json({ response, provider, cost: 0.0008 })
+      // JSON response with degraded flag
+      res.json({ response, provider, cost: estimatedCost, degraded })
     }
   } catch (error) {
     res.status(500).json({ error: 'Orchestration failed' })
@@ -99,5 +105,5 @@ app.post('/api/search', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🏠 EXPREZZZO API running on port ${PORT}`)
   console.log(`🔐 Sovereignty: ENFORCED`)
-  console.log(`💰 Target: $0.001/request`)
+  console.log(`💰 Target: $0.0002/request`)
 })

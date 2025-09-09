@@ -15,7 +15,7 @@ export default function ChatDemos() {
             Choose your preferred chat interface
           </p>
           <p className="text-sm text-vegas-gold mt-2">
-            All powered by sovereign AI at $0.001 per request
+            All powered by sovereign AI at $0.0002 per request
           </p>
         </div>
 
@@ -41,7 +41,7 @@ export default function ChatDemos() {
               </div>
               <div className="flex justify-between">
                 <span className="text-vegas-gold">Cost:</span>
-                <span className="text-green-500">$0.001</span>
+                <span className="text-green-500">$0.0002</span>
               </div>
             </div>
             
@@ -74,7 +74,7 @@ export default function ChatDemos() {
               </div>
               <div className="flex justify-between">
                 <span className="text-vegas-gold">Cost:</span>
-                <span className="text-green-500">$0.001</span>
+                <span className="text-green-500">$0.0002</span>
               </div>
             </div>
             
@@ -112,7 +112,7 @@ export default function ChatDemos() {
               </div>
               <div className="flex justify-between">
                 <span className="text-vegas-gold">Cost:</span>
-                <span className="text-green-500">$0.001</span>
+                <span className="text-green-500">$0.0002</span>
               </div>
             </div>
             
@@ -127,7 +127,7 @@ export default function ChatDemos() {
 
         <div className="text-center mt-12 py-8 border-t-2 border-vegas-gold/20">
           <p className="text-vegas-gold text-lg font-semibold mb-4">
-            🎰 All Chat Interfaces Guarantee $0.001 per Request 🎰
+            🎰 All Chat Interfaces Guarantee $0.0002 per Request 🎰
           </p>
           <div className="flex justify-center gap-8 text-sm text-desert-sand">
             <span>✓ Sovereign AI Models</span>

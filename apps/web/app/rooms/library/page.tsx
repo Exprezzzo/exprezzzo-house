@@ -50,7 +50,7 @@ export default function LibraryRoom() {
       },
       {
         id: '3',
-        title: '$0.001 Request Optimization',
+        title: '$0.0002 Request Optimization',
         type: 'document',
         description: 'Strategies for ultra-low-cost AI request processing and optimization',
         size: '1.8 MB',

@@ -198,7 +198,7 @@ export default function MasterRoom() {
         {/* Vegas Signature */}
         <div className="text-center mt-12 py-8 border-t-2 border-vegas-gold/20">
           <p className="text-vegas-gold text-lg font-semibold">
-            🎰 What happens in Vegas... gets processed at $0.001/request 🎰
+            🎰 What happens in Vegas... gets processed at $0.0002/request 🎰
           </p>
         </div>
       </div>

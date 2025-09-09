@@ -20,9 +20,9 @@ export default function ChatRoom() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const models = [
-    { id: 'llama3.2', name: 'Llama 3.2', cost: 0.001 },
-    { id: 'mistral', name: 'Mistral', cost: 0.001 },
-    { id: 'codellama:7b', name: 'CodeLlama 7B', cost: 0.001 },
+    { id: 'llama3.2', name: 'Llama 3.2', cost: 0.0002 },
+    { id: 'mistral', name: 'Mistral', cost: 0.0002 },
+    { id: 'codellama:7b', name: 'CodeLlama 7B', cost: 0.0002 },
   ]
 
   const scrollToBottom = () => {
@@ -39,7 +39,7 @@ export default function ChatRoom() {
       role: 'user',
       content: input,
       timestamp: new Date(),
-      cost: 0.001,
+      cost: 0.0002,
       model: selectedModel
     }
 
@@ -55,7 +55,7 @@ export default function ChatRoom() {
         body: JSON.stringify({
           message: input,
           model: selectedModel,
-          degrade: true // Enable $0.001 degrade mode
+          degrade: true // Enable $0.0002 degrade mode
         })
       })
 
@@ -66,7 +66,7 @@ export default function ChatRoom() {
         role: 'assistant',
         content: '',
         timestamp: new Date(),
-        cost: 0.001,
+        cost: 0.0002,
         model: selectedModel
       }
 
@@ -136,7 +136,7 @@ export default function ChatRoom() {
             </h1>
           </div>
           <p className="text-xl text-desert-sand mb-4">
-            Vegas-Style AI Chat - $0.001 per message
+            Vegas-Style AI Chat - $0.0002 per message
           </p>
           <div className="flex items-center justify-center gap-6 text-sm">
             <div className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function ChatRoom() {
                 <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p className="text-xl">Welcome to the Chat Room</p>
                 <p className="text-sm text-desert-sand mt-2">
-                  Start a conversation for just $0.001 per message
+                  Start a conversation for just $0.0002 per message
                 </p>
               </div>
             </div>
@@ -261,14 +261,14 @@ export default function ChatRoom() {
           </div>
           <div className="flex justify-between items-center mt-3 text-sm text-desert-sand/80">
             <span>Press Enter to send, Shift+Enter for new line</span>
-            <span className="text-vegas-gold">Cost per message: $0.001</span>
+            <span className="text-vegas-gold">Cost per message: $0.0002</span>
           </div>
         </div>
 
         {/* Vegas Footer */}
         <div className="text-center mt-8 py-6 border-t-2 border-vegas-gold/20">
           <p className="text-vegas-gold font-medium">
-            🎲 Every message is a roll of the dice at $0.001 🎲
+            🎲 Every message is a roll of the dice at $0.0002 🎲
           </p>
         </div>
       </div>

@@ -54,7 +54,7 @@ export default function WorkspaceRoom() {
         lastModified: new Date('2025-01-14'),
         size: '850 KB',
         language: 'Node.js',
-        description: 'API endpoint for $0.001 request optimization'
+        description: 'API endpoint for $0.0002 request optimization'
       },
       {
         id: '3',
@@ -98,7 +98,7 @@ class SovereignChatBot:
         self.cost_per_request = 0.001
         
     async def process_message(self, message: str, user_id: str):
-        """Process user message with $0.001 cost tracking"""
+        """Process user message with $0.0002 cost tracking"""
         try:
             # Log request for cost tracking
             request_id = self.log_request(user_id)
@@ -160,7 +160,7 @@ print("🎰 Sovereign Chat Bot initialized - Ready to roll! 🎰")`)
     setTerminal(prev => [...prev, '✓ Ollama model loaded: llama3.2'])
     
     await new Promise(resolve => setTimeout(resolve, 500))
-    setTerminal(prev => [...prev, '✓ Cost tracking enabled: $0.001 per request'])
+    setTerminal(prev => [...prev, '✓ Cost tracking enabled: $0.0002 per request'])
     
     await new Promise(resolve => setTimeout(resolve, 500))
     setTerminal(prev => [...prev, '🚀 Bot is live and ready for requests!'])
@@ -361,7 +361,7 @@ print("🎰 Sovereign Chat Bot initialized - Ready to roll! 🎰")`)
         {/* Vegas Footer */}
         <div className="text-center mt-12 py-8 border-t-2 border-vegas-gold/20">
           <p className="text-vegas-gold text-lg font-semibold">
-            ⚡ Code like a high-roller - Every line counts at $0.001 ⚡
+            ⚡ Code like a high-roller - Every line counts at $0.0002 ⚡
           </p>
         </div>
       </div>

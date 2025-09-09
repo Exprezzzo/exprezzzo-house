@@ -8,16 +8,16 @@ const mockOllamaResponse = async (message: string, model: string) => {
   const responses: { [key: string]: string[] } = {
     'llama3.2': [
       "I understand your request. Let me help you with that using my sovereign capabilities.",
-      "As an AI running locally at $0.001 per request, I aim to provide cost-effective assistance.",
+      "As an AI running locally at $0.0002 per request, I aim to provide cost-effective assistance.",
       "Vegas-style efficiency meets sovereign computing - that's how I roll!"
     ],
     'mistral': [
       "Bonjour! I'm Mistral running in your sovereign house.",
-      "Efficient, local, and cost-effective - just $0.001 per interaction.",
+      "Efficient, local, and cost-effective - just $0.0002 per interaction.",
       "Your data stays in Vegas, processed with European precision."
     ],
     'codellama:7b': [
-      "```python\n# Here's a code solution for you\ndef sovereign_response():\n    return 'Local AI at $0.001/request'\n```",
+      "```python\n# Here's a code solution for you\ndef sovereign_response():\n    return 'Local AI at $0.0002/request'\n```",
       "Let me code that up for you using local processing power.",
       "Sovereign code generation - keeping your logic in-house."
     ]
@@ -30,7 +30,7 @@ const mockOllamaResponse = async (message: string, model: string) => {
   const vegasEnding = [
     "\n\n🎰 Processed locally, Vegas-style! 🎰",
     "\n\n🎲 What happens in your house, stays in your house! 🎲",
-    "\n\n🎪 Sovereign AI - the house always wins at $0.001! 🎪"
+    "\n\n🎪 Sovereign AI - the house always wins at $0.0002! 🎪"
   ]
   
   return baseResponse + vegasEnding[Math.floor(Math.random() * vegasEnding.length)]
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
             const sseData = `data: ${JSON.stringify({
               content: chunk,
               model,
-              cost: 0.001,
+              cost: 0.0002,
               timestamp: new Date().toISOString()
             })}\n\n`
             
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
             content: '',
             done: true,
             model,
-            total_cost: 0.001,
+            total_cost: 0.0002,
             timestamp: new Date().toISOString()
           })}\n\n`))
           

@@ -10,7 +10,7 @@ const { readFileSync } = require('fs')
 class ExprezzoOrchestrator {
   constructor() {
     this.services = new Map()
-    this.budget = 0.001 // $0.001 per request
+    this.budget = 0.001 // $0.0002 per request
     this.degraded = false
   }
 
