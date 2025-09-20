@@ -1,0 +1,38 @@
+model_list:
+  # LOCAL CPU MODEL (via Ollama)
+  - model_name: "local-cpu"
+    litellm_params:
+      model: "ollama/llama3.2:3b"
+      api_base: "http://ollama:11434"
+      temperature: 0.1
+    model_info:
+      mode: "cpu_local"
+      
+  # EXTERNAL API - Primary Brain
+  - model_name: "groq-primary"
+    litellm_params:
+      model: "groq/llama-3.1-70b-versatile"
+      api_key: "os.environ/GROQ_API_KEY"
+      temperature: 0.3
+      max_tokens: 4096
+    model_info:
+      mode: "tier1_external"
+      
+  # EXTERNAL API - Cheap Overflow
+  - model_name: "deepseek-cheap"
+    litellm_params:
+      model: "deepseek/deepseek-chat"
+      api_key: "os.environ/DEEPSEEK_API_KEY"
+      temperature: 0.5
+      max_tokens: 2048
+    model_info:
+      mode: "tier2_overflow"
+
+router_settings:
+  routing_strategy: "usage-based-routing"
+  redis_host: "redis"
+  redis_port: 6379
+  enable_cache: true
+  cache_ttl: 86400
+  track_cost: true
+  max_cost_per_day: 10.0

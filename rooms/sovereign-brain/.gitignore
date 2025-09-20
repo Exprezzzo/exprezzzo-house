@@ -1,0 +1,9 @@
+data/
+models/
+*.pyc
+__pycache__/
+.env
+*.rdb
+*.log
+id_ed25519*
+id_rsa*
