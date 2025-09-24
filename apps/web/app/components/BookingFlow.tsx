@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { CreditCard, Shield, Clock, CheckCircle, AlertTriangle, PaypalIcon as PayPal } from 'lucide-react'
-import analytics from '../../../../lib/analytics'
-import costGuard from '../../../../lib/cost-guard'
+import { CreditCard, Shield, Clock, CheckCircle, AlertTriangle, Wallet } from 'lucide-react'
+import analytics from '../../lib/analytics'
+import costGuard from '../../lib/cost-guard'
 
 interface BookingData {
   serviceType: string
@@ -389,7 +389,7 @@ export default function BookingFlow({ bookingData, onComplete, onCancel }: Booki
                 }`}
               >
                 {method.type === 'stripe' && <CreditCard className="w-5 h-5" />}
-                {method.type === 'paypal' && <PayPal className="w-5 h-5" />}
+                {method.type === 'paypal' && <Wallet className="w-5 h-5" />}
                 {method.type === 'demo' && <Shield className="w-5 h-5" />}
                 <span className="capitalize">{method.type === 'demo' ? 'Demo Mode' : method.type}</span>
                 {method.processingFee > 0 && (

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Crown, Calendar, MapPin, Users, DollarSign, ArrowLeft, Star } from 'lucide-react'
 import BookingFlow from '../../../components/BookingFlow'
-import analytics from '../../../../../lib/analytics'
+import analytics from '../../../../lib/analytics'
 
 interface Service {
   id: string
