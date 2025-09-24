@@ -8,8 +8,9 @@ export default {
     extend: {
       colors: {
         'vegas-gold': '#C5B358',
-        'chocolate': '#381819',
+        'chocolate': '#2C1810',
         'desert-sand': '#EDC9AF',
+        'vegas-dust': '#3E2723',
         'rose-red': '#C72C41',
         'dust': '#A89F91',
         'light-sand': '#F5F5DC',

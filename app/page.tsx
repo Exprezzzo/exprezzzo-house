@@ -24,7 +24,7 @@ export default function Home() {
           </a>
         </div>
         <div className="mt-8 p-4 bg-amber-900 text-white rounded">
-          <p>EXPREZZZO = 3 Z's | Sovereign AI | $0.001/request</p>
+          <p>EXPREZZZO = 3 Z's | Sovereign AI | $0.0002/request</p>
         </div>
       </div>
     </div>
