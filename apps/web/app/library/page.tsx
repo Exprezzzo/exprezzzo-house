@@ -24,7 +24,10 @@ export default function LibraryRoom() {
     setLoading(true)
 
     try {
-      const data = await api.embed(content)
+      const data = await api.embed({
+        content,
+        room: 'Library'
+      })
       alert(`Added to library with ID: ${data.id}`)
       setContent('')
     } catch (error) {
