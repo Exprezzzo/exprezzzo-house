@@ -1,14 +1,18 @@
 {
-  "buildCommand": "cd apps/web && npm install && npm run build",
+  "buildCommand": "pnpm turbo build --filter=web",
   "outputDirectory": "apps/web/.next",
+  "installCommand": "pnpm install",
   "framework": "nextjs",
-  "installCommand": "cd apps/web && npm install",
+  "regions": ["iad1"],
   "functions": {
-    "apps/web/app/api/chat/sse/route.ts": {
-      "maxDuration": 10
-    },
-    "apps/web/app/api/sse/*/route.ts": {
-      "maxDuration": 10
+    "apps/web/app/api/**/*.ts": {
+      "maxDuration": 30
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ]
 }
