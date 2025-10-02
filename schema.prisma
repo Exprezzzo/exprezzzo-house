@@ -1,0 +1,218 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id           String         @id @default(cuid())
+  name         String         @unique
+  slug         String         @unique
+  description  String?
+  imageUrl     String?
+  displayOrder Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  vendors      Vendor[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  displayOrder Int      @default(0)
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  vendors      Vendor[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum VendorTier {
+  TIER_N
+  TIER_3
+  TIER_2
+  TIER_1
+  TIER_0
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+model Vendor {
+  id               String         @id @default(cuid())
+  name             String
+  description      String?
+  categoryId       String
+  category         Category       @relation(fields: [categoryId], references: [id])
+  subcategoryId    String?
+  subcategory      Subcategory?   @relation(fields: [subcategoryId], references: [id])
+  tier             VendorTier     @default(TIER_0)
+  status           VendorStatus   @default(ACTIVE)
+  zone             String?
+  latitude         Float?
+  longitude        Float?
+  rating           Float?         @default(4.0)
+  priceRange       String?
+  address          String?
+  phone            String?
+  email            String?
+  website          String?
+  images           String?        // JSON string array
+  amenities        String?        // JSON string array
+  businessHours    Json?
+  isVerified       Boolean        @default(false)
+  commissionRate   Float?         @default(0.0)
+  features         Json?          // Feature flags
+  featured         Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  bookings         Booking[]
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  vendorId      String
+  vendor        Vendor   @relation(fields: [vendorId], references: [id])
+  customerName  String
+  customerEmail String
+  date          DateTime
+  status        String   @default("pending")
+  amount        Float?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  commissions   Commission[]
+  transactions  Transaction[]
+}
+
+model Affiliate {
+  id                String        @id @default(cuid())
+  userId            String?       @unique
+  referralCode      String        @unique
+  parentAffiliateId String?
+  parentAffiliate   Affiliate?    @relation("AffiliateHierarchy", fields: [parentAffiliateId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  childAffiliates   Affiliate[]   @relation("AffiliateHierarchy")
+  name              String
+  email             String        @unique
+  phone             String?
+  level             Int           @default(1)
+  totalEarnings     Float         @default(0.0)
+  pendingEarnings   Float         @default(0.0)
+  paidEarnings      Float         @default(0.0)
+  isActive          Boolean       @default(true)
+  joinedAt          DateTime      @default(now())
+  lastActivityAt    DateTime?
+  paymentInfo       Json?         // Bank/PayPal details
+  commissions       Commission[]
+  transactions      Transaction[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([referralCode])
+  @@index([parentAffiliateId])
+  @@index([email])
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+enum CommissionType {
+  DIRECT_SALE
+  LEVEL_COMMISSION
+  BONUS
+}
+
+model Commission {
+  id            String           @id @default(cuid())
+  affiliateId   String
+  affiliate     Affiliate        @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  bookingId     String?
+  booking       Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  transactionId String?
+  transaction   Transaction?     @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  type          CommissionType   @default(LEVEL_COMMISSION)
+  level         Int              // 1-10 for MLM levels
+  amount        Float
+  percentage    Float            // Commission rate used
+  saleAmount    Float            // Original sale amount
+  status        CommissionStatus @default(PENDING)
+  processedAt   DateTime?
+  paidAt        DateTime?
+  notes         String?
+  batchId       String?          // For batch processing
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([affiliateId, status])
+  @@index([bookingId])
+  @@index([batchId])
+  @@index([createdAt])
+}
+
+enum TransactionType {
+  SALE
+  REFUND
+  COMMISSION_PAYOUT
+  BONUS_PAYOUT
+  ADJUSTMENT
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  affiliateId   String?
+  affiliate     Affiliate?        @relation(fields: [affiliateId], references: [id], onDelete: SetNull)
+  bookingId     String?
+  booking       Booking?          @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+  amount        Float
+  currency      String            @default("USD")
+  description   String?
+  referenceId   String?           // External payment system reference
+  metadata      Json?
+  processedAt   DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  commissions   Commission[]
+
+  @@index([affiliateId, type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CommissionBatch {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  totalAmount     Float
+  commissionCount Int
+  status          String    @default("pending")
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

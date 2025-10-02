@@ -22,9 +22,10 @@
   "author": "EXPREZZZO House",
   "license": "MIT",
   "dependencies": {
-    "next": "^14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "next": "^15.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -33,5 +34,14 @@
     "type": "git",
     "url": "git+https://github.com/exprezzzo/sovereign-house.git"
   },
-  "homepage": "https://exprezzzo-house.vercel.app"
+  "homepage": "https://exprezzzo-house.vercel.app",
+  "devDependencies": {
+    "@prisma/client": "^6.16.3",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "prisma": "^6.16.3",
+    "tailwindcss": "^4.1.13"
+  }
 }

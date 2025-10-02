@@ -1,96 +1,32 @@
 version: '3.8'
-
 services:
-  exprezzzo-house:
-    build: .
-    container_name: exprezzzo-sovereign-house
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - SOVEREIGNTY_ENFORCED=true
-      - TARGET_COST=0.001
-      - POSTGRES_URL=postgres://sovereign:vegas@postgres:5432/exprezzzo
-      - REDIS_URL=redis://redis:6379
-      - OLLAMA_URL=http://ollama:11434
-    depends_on:
-      - postgres
-      - redis
-      - ollama
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
-
   postgres:
-    image: postgres:16-alpine
-    container_name: exprezzzo-postgres
+    image: postgres:17-alpine
+    container_name: exprezzzo-house-postgres-1
     environment:
-      - POSTGRES_USER=sovereign
-      - POSTGRES_PASSWORD=vegas
-      - POSTGRES_DB=exprezzzo
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      POSTGRES_DB: exprezzzo
+      POSTGRES_USER: exprezzzo
+      POSTGRES_PASSWORD: Exp3zzz0_2025
     ports:
       - "5432:5432"
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
-    container_name: exprezzzo-redis
+    container_name: exprezzzo-house-redis-1
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --requirepass Exp3zzz0_Redis
 
   ollama:
     image: ollama/ollama:latest
-    container_name: exprezzzo-ollama
+    container_name: exprezzzo-house-ollama-1
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-
-  caddy:
-    image: caddy:alpine
-    container_name: exprezzzo-caddy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - exprezzzo-network
-    restart: unless-stopped
-    depends_on:
-      - exprezzzo-house
 
 volumes:
   postgres_data:
-    name: exprezzzo_postgres_data
-  redis_data:
-    name: exprezzzo_redis_data
   ollama_data:
-    name: exprezzzo_ollama_data
-  caddy_data:
-    name: exprezzzo_caddy_data
-  caddy_config:
-    name: exprezzzo_caddy_config
-
-networks:
-  exprezzzo-network:
-    name: exprezzzo-network
-    driver: bridge
