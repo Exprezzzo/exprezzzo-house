@@ -1,19 +1,53 @@
 {
-  "name": "exprezzzo-house",
-  "version": "1.0.0",
-  "private": true,
+  "name": "exprezzzo-sovereign-house",
+  "version": "4.1.0",
+  "description": "Vegas-first, sovereign-always, $0.0002/request",
   "packageManager": "pnpm@10.17.1",
+  "main": "server.js",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
+    "start": "node server.js",
+    "orchestrate": "node orchestrator.js",
     "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint"
+    "dev": "turbo run dev",
+    "deploy": "./build-production.sh",
+    "sovereignty": "node scripts/sovereignty-check.js"
   },
+  "keywords": [
+    "exprezzzo",
+    "sovereign",
+    "vegas",
+    "ai",
+    "llm",
+    "nextjs"
+  ],
+  "author": "EXPREZZZO House",
+  "license": "MIT",
+  "dependencies": {
+    "next": "^15.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exprezzzo/sovereign-house.git"
+  },
+  "homepage": "https://exprezzzo-house.vercel.app",
   "devDependencies": {
+    "@prisma/client": "^6.16.3",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "prisma": "^6.16.3",
+    "tailwindcss": "^4.1.13",
     "turbo": "latest"
   }
 }
