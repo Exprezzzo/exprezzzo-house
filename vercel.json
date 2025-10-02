@@ -4,11 +4,6 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "functions": {
-    "apps/web/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/api/:path*",
